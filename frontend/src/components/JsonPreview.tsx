@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { Copy, Check } from 'lucide-react';
+import { Copy, Check, Code } from 'lucide-react';
+import { Button } from './ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { TestConfig } from '../types/TestConfig';
 import toast from 'react-hot-toast';
 
 interface JsonPreviewProps {
-  testConfig: TestConfig;
+  config: TestConfig;
 }
 
-const JsonPreview: React.FC<JsonPreviewProps> = ({ testConfig }) => {
+const JsonPreview: React.FC<JsonPreviewProps> = ({ config }) => {
   const [copied, setCopied] = useState(false);
 
-  const formattedJson = JSON.stringify(testConfig, null, 4);
+  const formattedJson = JSON.stringify(config, null, 2);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(formattedJson);
@@ -20,38 +22,51 @@ const JsonPreview: React.FC<JsonPreviewProps> = ({ testConfig }) => {
   };
 
   return (
-    <div className="bg-primary-800 rounded-xl shadow-sm p-6 text-white">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">JSON Output</h2>
-        <button
-          onClick={handleCopy}
-          className="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-primary-700 hover:bg-primary-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500"
-          aria-label="Copy JSON to clipboard"
-        >
-          {copied ? (
-            <>
-              <Check size={16} className="mr-1.5 text-green-400" />
-              <span className="text-green-400">Copied!</span>
-            </>
-          ) : (
-            <>
-              <Copy size={16} className="mr-1.5" />
-              <span>Copy</span>
-            </>
-          )}
-        </button>
-      </div>
+    <Card>
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Code className="h-5 w-5 text-[#D9653B]" />
+              Configuration Preview
+            </CardTitle>
+            <CardDescription>
+              JSON representation of your test configuration
+            </CardDescription>
+          </div>
+          <Button
+            onClick={handleCopy}
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            {copied ? (
+              <>
+                <Check className="h-4 w-4 text-green-400" />
+                <span className="text-green-400">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-4 w-4" />
+                Copy JSON
+              </>
+            )}
+          </Button>
+        </div>
+      </CardHeader>
       
-      <div className="flex-1 overflow-auto bg-primary-900/50 rounded-md p-4">
-        <pre className="text-sm font-mono text-primary-50 whitespace-pre-wrap break-words">
-          {formattedJson}
-        </pre>
-      </div>
-      
-      <div className="mt-4 text-sm text-primary-200">
-        <p>This JSON configuration can be used with compatible web testing frameworks.</p>
-      </div>
-    </div>
+      <CardContent>
+        <div className="bg-[#252525] rounded-lg p-3 overflow-auto max-h-64">
+          <pre className="text-xs font-mono text-[#A1A1A1] whitespace-pre-wrap break-words">
+            {formattedJson}
+          </pre>
+        </div>
+        
+        <p className="mt-4 text-sm text-[#A1A1A1]">
+          This configuration can be used with compatible web testing frameworks.
+        </p>
+      </CardContent>
+    </Card>
   );
 };
 

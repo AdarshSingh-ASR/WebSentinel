@@ -1,23 +1,25 @@
 import React from 'react';
-import { Compass } from 'lucide-react';
+import { Activity } from 'lucide-react';
 
 const Header: React.FC = () => {
   return (
-    <header className="bg-primary-800 shadow-lg py-4 px-6 md:px-8">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Compass className="h-6 w-6 text-white" />
-          <h1 className="text-xl font-semibold text-white">WebTest AI</h1>
+    <header className="border-b border-[#A1A1A1]/10 bg-[#1E1E1E] py-6 px-8">
+      <div className="max-w-6xl mx-auto flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 rounded-lg bg-[#D9653B]">
+            <Activity className="h-5 w-5 text-white" />
+          </div>
+          <h1 className="text-xl font-medium text-white tracking-tight">WebSentinel</h1>
         </div>
         <nav>
-          <ul className="flex space-x-6">
+          <ul className="flex space-x-8">
             <li>
-              <a href="#" className="text-sm font-medium text-primary-100 hover:text-white transition-colors">
+              <a href="#" className="text-sm text-[#A1A1A1] hover:text-white transition-colors duration-200">
                 Documentation
               </a>
             </li>
             <li>
-              <a href="#" className="text-sm font-medium text-primary-100 hover:text-white transition-colors">
+              <a href="#" className="text-sm text-[#A1A1A1] hover:text-white transition-colors duration-200">
                 Examples
               </a>
             </li>
