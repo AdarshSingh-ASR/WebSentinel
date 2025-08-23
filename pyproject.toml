@@ -1,0 +1,13 @@
+[project]
+name = "portia-hack"
+version = "0.1.0"
+description = "AI Website Testing Agent Platform powered by Portia AI - AgentHack 2025"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "portia-sdk-python[google]>=0.1.0",
+    "browser-use>=0.1.48",
+    "fastapi>=0.115.12",
+    "python-dotenv>=1.0.0",
+    "uvicorn>=0.34.2",
+]
