@@ -1,3 +1,4 @@
 .env
 operation_logs/
 .venv/
+portiarules.txt
