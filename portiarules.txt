@@ -1,0 +1,3056 @@
+========================
+CODE SNIPPETS
+========================
+TITLE: Portia AI Setup and Configuration Links
+DESCRIPTION: Provides links to essential setup and configuration guides for Portia AI, including installation, account setup, and configuration management.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/index.mdx#_snippet_2
+
+LANGUAGE: APIDOC
+CODE:
+```
+Setup Guides:
+
+1. Install and setup
+   - Description: Get Portia AI set up and run your first query.
+   - Link: /install
+
+2. Set up a Portia account
+   - Description: Sign up for a Portia cloud account.
+   - Link: /setup-account
+
+3. Manage your config
+   - Description: Learn how to configure your Portia environment.
+   - Link: /manage-config
+```
+
+----------------------------------------
+
+TITLE: Install Dependencies
+DESCRIPTION: Installs project dependencies using yarn.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/README.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+yarn install
+```
+
+----------------------------------------
+
+TITLE: Run Code Example Tests
+DESCRIPTION: Executes code example tests using pytest.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/README.md#_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+uv run pytest
+```
+
+----------------------------------------
+
+TITLE: Start Development Server
+DESCRIPTION: Starts the Docusaurus development server.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/README.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+yarn start
+```
+
+----------------------------------------
+
+TITLE: Install Portia Python SDK
+DESCRIPTION: Installs the Portia Python SDK and its core dependencies using pip. This command is the basic installation for the SDK.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+pip install portia-sdk-python
+```
+
+----------------------------------------
+
+TITLE: Install SteelThread
+DESCRIPTION: Install the SteelThread library using your preferred package manager: pip, poetry, or uv.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Evals and SteelThread/Quickstart.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+pip install steel-thread
+```
+
+LANGUAGE: bash
+CODE:
+```
+poetry add steel-thread
+```
+
+LANGUAGE: bash
+CODE:
+```
+uv add steel-thread
+```
+
+----------------------------------------
+
+TITLE: Portia CLI Output Example
+DESCRIPTION: An example of the JSON output returned by the Portia CLI after executing a plan. Key fields to check are 'state' and 'final_output'.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_14
+
+LANGUAGE: json
+CODE:
+```
+{
+    "id": "prun-13a97e70-2ca6-41c9-bc49-b7f84f6d3982",
+    "plan_id": "plan-96693022-598e-458c-8d2f-44ba51d4f0b5",
+    "current_step_index": 0,
+    "clarifications": [],
+    "state": "COMPLETE",
+    "step_outputs": {
+        "$result": {
+            "value": 3.0
+        }
+    },
+    "final_output": {
+        "value": 3.0
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Install Portia SDK with Extra Dependencies
+DESCRIPTION: Installs the Portia Python SDK with additional dependencies for specific LLM providers. Use 'all' for all providers, or specify individual providers like 'amazon', 'google', or 'mistral'.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_1
+
+LANGUAGE: bash
+CODE:
+```
+pip install "portia-sdk-python[all]"
+pip install "portia-sdk-python[amazon]"
+pip install "portia-sdk-python[google]"
+pip install "portia-sdk-python[mistral]"
+```
+
+----------------------------------------
+
+TITLE: Start Development Server on Custom Port
+DESCRIPTION: Starts the Docusaurus development server on a specified port.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/README.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+PORT=3002 yarn start
+```
+
+----------------------------------------
+
+TITLE: Test Portia with OpenAI
+DESCRIPTION: Instantiates Portia with default configuration for OpenAI and runs a simple arithmetic query. Requires OPENAI_API_KEY in .env.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_15
+
+LANGUAGE: python
+CODE:
+```
+from dotenv import load_dotenv
+from portia import (
+    Portia,
+    default_config,
+    example_tool_registry,
+)
+
+load_dotenv()
+
+# Instantiate Portia with the default config which uses Open AI, and with some example tools.
+portia = Portia(tools=example_tool_registry)
+# Run the test query and print the output!
+plan_run = portia.run('add 1 + 2')
+print(plan_run.model_dump_json(indent=2))
+```
+
+----------------------------------------
+
+TITLE: Run Example Script
+DESCRIPTION: This command executes a Python script using the 'uv' runner. It handles Python version management, virtual environment creation, dependency installation, and script execution.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/A tour of our SDK.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+uv run <script_name>.py
+```
+
+----------------------------------------
+
+TITLE: Conditional Code Execution in Tests
+DESCRIPTION: Demonstrates how to manage code dependencies and execution flow within the testing framework.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/README.md#_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+```python
+# Example of depending on another code snippet
+```python
+```python depends_on=example1
+print('This code depends on example1')
+```
+
+```python
+# Example of invisible setup code
+```python
+<!-- 
+```python id=example1
+print('This is example1 setup code')
+```
+ -->
+
+```python
+# Example of specifying test containers
+```python
+```python test_containers=redis
+# Code that requires redis
+```
+
+```python
+# Example of skipping a test
+```python
+```python skip=true skip_reason="Not expecting users to run this"
+print('This test will be skipped')
+```
+```
+
+----------------------------------------
+
+TITLE: Run Portia CLI with OpenAI
+DESCRIPTION: Executes a simple math prompt using the Portia CLI with the OpenAI LLM provider. This is the default provider.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_8
+
+LANGUAGE: bash
+CODE:
+```
+portia-cli run "add 1 + 2"
+```
+
+----------------------------------------
+
+TITLE: Run Portia CLI with Google GenAI
+DESCRIPTION: Executes a simple math prompt using the Portia CLI, specifically targeting the Google GenAI LLM provider.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_11
+
+LANGUAGE: bash
+CODE:
+```
+portia-cli run --llm-provider="google" "add 1 + 2"
+```
+
+----------------------------------------
+
+TITLE: Portia AI Example Overview
+DESCRIPTION: This table summarizes the different example files available for Portia AI, detailing their focus and the features they introduce. It serves as a quick reference for users to select examples relevant to their needs, ranging from OAuth API usage to multi-tool agent capabilities and web automation.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/A tour of our SDK.md#_snippet_16
+
+LANGUAGE: APIDOC
+CODE:
+```
+Summary Table:
+
+| Example File                | Focus             | Features Introduced                      |
+| --------------------------- | ----------------- | ---------------------------------------- |
+| `1_github_oauth.py`         | OAuth API use     | OAuth, basic agent commands              |
+| `2_tools_end_users_llms.py` | Multi-tool agent  | End users, multi-step reasoning          |
+| `3_mcp.py`                  | Running MCP Tools | MCP format, structured execution         |
+| `4_browser_use.py`          | Web automation    | Browser automation, local & remote modes |
+```
+
+----------------------------------------
+
+TITLE: Test Portia with Google GenAI
+DESCRIPTION: Instantiates Portia with Google GenAI configuration (Gemini 2.0 Flash) and runs a simple arithmetic query. Requires GOOGLE_API_KEY in .env.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_18
+
+LANGUAGE: python
+CODE:
+```
+import os
+from dotenv import load_dotenv
+from portia import (
+    Config,
+    LLMProvider,
+    Portia,
+    example_tool_registry,
+)
+
+load_dotenv()
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+
+# Create a default Portia config with LLM provider set to Google GenAI and model set to Gemini 2.0 Flash
+google_config = Config.from_default(
+    llm_provider=LLMProvider.GOOGLE,
+    default_model="google/gemini-2.0-flash",
+    google_api_key=GOOGLE_API_KEY
+)
+# Instantiate a Portia instance. Load it with the config and with the example tools.
+portia = Portia(config=google_config, tools=example_tool_registry)
+# Run the test query and print the output!
+plan_run = portia.run('add 1 + 2')
+print(plan_run.model_dump_json(indent=2))
+```
+
+----------------------------------------
+
+TITLE: Configure Google GenAI API Key
+DESCRIPTION: Sets the environment variable for the Google GenAI API key. Ensure Google GenAI dependencies are installed before setting this.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_5
+
+LANGUAGE: bash
+CODE:
+```
+export GOOGLE_API_KEY='your-api-key-here'
+```
+
+----------------------------------------
+
+TITLE: Run Portia CLI with Azure OpenAI
+DESCRIPTION: Executes a simple math prompt using the Portia CLI, specifically targeting the Azure OpenAI LLM provider.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_12
+
+LANGUAGE: bash
+CODE:
+```
+portia-cli run --llm-provider="azure-openai" "add 1 + 2"
+```
+
+----------------------------------------
+
+TITLE: Run Portia CLI with Amazon Bedrock
+DESCRIPTION: Executes a simple math prompt using the Portia CLI, specifically targeting the Amazon Bedrock LLM provider.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_13
+
+LANGUAGE: bash
+CODE:
+```
+portia-cli run --llm-provider="amazon" "add 1 + 2"
+```
+
+----------------------------------------
+
+TITLE: Install and Run mcp-server-fetch
+DESCRIPTION: Demonstrates how to download and run the 'mcp-server-fetch' tool using uvx. This is a command-line instruction and should not be executed directly in this context.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/A tour of our SDK.md#_snippet_12
+
+LANGUAGE: bash
+CODE:
+```
+# Don't actually run this:
+uvx mcp-server-fetch
+```
+
+----------------------------------------
+
+TITLE: Environment Variable Setup
+DESCRIPTION: Instructions for setting up environment variables for AWS and Azure OpenAI API keys and endpoints in a local .env file.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_21
+
+LANGUAGE: env
+CODE:
+```
+AWS_ACCESS_KEY_ID=YOUR_AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY=YOUR_AWS_SECRET_ACCESS_KEY
+AWS_DEFAULT_REGION=YOUR_AWS_DEFAULT_REGION
+AWS_CREDENTIALS_PROFILE_NAME=YOUR_AWS_PROFILE_NAME
+
+AZURE_OPENAI_API_KEY=YOUR_AZURE_OPENAI_API_KEY
+AZURE_OPENAI_ENDPOINT=YOUR_AZURE_OPENAI_ENDPOINT
+```
+
+----------------------------------------
+
+TITLE: Define Example Tasks for Portia
+DESCRIPTION: Defines two example tasks: a simple task to star a GitHub repository and a more complex task involving calendar checks and meeting scheduling.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/A tour of our SDK.md#_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+# A relatively simple task:
+task0 = "Star the github repo for portiaAI/portia-sdk-python"
+
+# A more complex task:
+task1 = ""
+Check my availability in Google Calendar for tomorrow between 10am and 12pm.
+If I have any free times between 10am and 12pm, please schedule a 30-minute meeting with
+bob (bob@portialabs.ai) with title 'Encode Hackathon', and description 'hack it'.
+If I don't have any free times, please output the next time after 12pm when I am free.
+"
+```
+
+----------------------------------------
+
+TITLE: Test Portia with Mistral AI
+DESCRIPTION: Instantiates Portia with Mistral AI configuration (Mistral Large) and runs a simple arithmetic query. Requires MISTRAL_API_KEY in .env.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_17
+
+LANGUAGE: python
+CODE:
+```
+import os
+from dotenv import load_dotenv
+from portia import (
+    Config,
+    LLMProvider,
+    Portia,
+    example_tool_registry,
+)
+
+load_dotenv()
+MISTRAL_API_KEY = os.getenv('MISTRAL_API_KEY')
+
+# Create a default Portia config with LLM provider set to Mistral AI and the latest Mistral Large model
+mistral_config = Config.from_default(
+    llm_provider=LLMProvider.MISTRALAI,
+    default_model="mistralai/mistral-large-latest",
+    mistralai_api_key=MISTRAL_API_KEY
+)
+# Instantiate a Portia instance. Load it with the config and with the example tools.
+portia = Portia(config=mistral_config, tools=example_tool_registry)
+# Run the test query and print the output!
+plan_run = portia.run('add 1 + 2')
+print(plan_run.model_dump_json(indent=2))
+```
+
+----------------------------------------
+
+TITLE: Run Portia CLI with Anthropic
+DESCRIPTION: Executes a simple math prompt using the Portia CLI, specifically targeting the Anthropic LLM provider.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_9
+
+LANGUAGE: bash
+CODE:
+```
+portia-cli run --llm-provider="anthropic" "add 1 + 2"
+```
+
+----------------------------------------
+
+TITLE: Portia Configuration Example
+DESCRIPTION: Demonstrates loading default Portia configuration, setting storage class to DISK, specifying a storage directory, setting the default log level to DEBUG, and configuring a Redis cache URL. This example shows how to initialize a Portia instance with custom settings.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/Manage config options.md#_snippet_25
+
+LANGUAGE: python
+CODE:
+```
+from dotenv import load_dotenv
+from portia import (
+    Config,
+    LogLevel,
+    Portia,
+    StorageClass,
+)
+from portia.open_source_tools.registry import example_tool_registry
+
+load_dotenv()
+
+# Load the default config with specified storage, logging and caching options
+my_config = Config.from_default(
+    storage_class=StorageClass.DISK, 
+    storage_dir='demo_runs', # Amend this based on where you'd like your plans and plan runs saved!
+    default_log_level=LogLevel.DEBUG,
+    llm_redis_cache_url="redis://localhost:6379"
+)
+
+# Instantiate a Portia instance. Load it with the default config and with some example tools
+portia = Portia(config=my_config, tools=example_tool_registry)
+
+# Execute the plan run from the user query
+output = portia.run('Which stock price grew faster in 2024, Amazon or Google?')
+
+```
+
+----------------------------------------
+
+TITLE: Initialize Monday.com MCP Server Connection
+DESCRIPTION: Establishes a connection to the monday.com MCP server using environment API credentials. This is the basic setup required to start interacting with monday.com data.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/portia-tools/local-mcp/monday.com.mdx#_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+McpToolRegistry.from_stdio_connection(
+    server_name="monday.com",
+    command="npx",
+    args=[
+        "@mondaydotcomorg/monday-api-mcp",
+        "-t",
+        "<api_key>",
+    ],
+)
+```
+
+----------------------------------------
+
+TITLE: Configure Mistral API Key
+DESCRIPTION: Sets the environment variable for the Mistral API key. Ensure Mistral dependencies are installed before setting this.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_4
+
+LANGUAGE: bash
+CODE:
+```
+export MISTRAL_API_KEY='your-api-key-here'
+```
+
+----------------------------------------
+
+TITLE: Run Portia CLI with Mistral AI
+DESCRIPTION: Executes a simple math prompt using the Portia CLI, specifically targeting the Mistral AI LLM provider.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_10
+
+LANGUAGE: bash
+CODE:
+```
+portia-cli run --llm-provider="mistralai" "add 1 + 2"
+```
+
+----------------------------------------
+
+TITLE: Instantiate Portia with Example Tools
+DESCRIPTION: Instantiates a Portia instance with a list of example tools, including CalculatorTool, SearchTool, and WeatherTool. This allows the agent to utilize these functionalities for answering queries.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Extend and run tools/Integrating tools.md#_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+from portia import (
+  default_config, 
+  Portia,
+)
+from portia.open_source_tools.calculator_tool import CalculatorTool
+from portia.open_source_tools.search_tool import SearchTool
+from portia.open_source_tools.weather import WeatherTool
+
+# Instantiate a Portia instance. Load it with the default config and with the example tools.
+portia = Portia(tools=[CalculatorTool(), SearchTool(), WeatherTool()])
+```
+
+----------------------------------------
+
+TITLE: Test Portia with Anthropic
+DESCRIPTION: Instantiates Portia with Anthropic configuration (Claude 3.5 Sonnet) and runs a simple arithmetic query. Requires ANTHROPIC_API_KEY in .env.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_16
+
+LANGUAGE: python
+CODE:
+```
+import os
+from dotenv import load_dotenv
+from portia import (
+    Config,
+    LLMProvider,
+    Portia,
+    example_tool_registry,
+)
+
+load_dotenv()
+ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
+
+# Create a default Portia config with LLM provider set to Anthropic and to the Sonnet 3.5 model
+anthropic_config = Config.from_default(
+    llm_provider=LLMProvider.ANTHROPIC,
+    default_model="anthropic/claude-3-5-sonnet-latest",
+    anthropic_api_key=ANTHROPIC_API_KEY
+)
+# Instantiate a Portia instance. Load it with the config and with the example tools.
+portia = Portia(config=anthropic_config, tools=example_tool_registry)
+# Run the test query and print the output!
+plan_run = portia.run('add 1 + 2')
+print(plan_run.model_dump_json(indent=2))
+```
+
+----------------------------------------
+
+TITLE: Complete Supabase Integration Example
+DESCRIPTION: Provides a comprehensive example of equipping a Portia instance with Supabase tools alongside default tools. It demonstrates how to combine multiple tool registries for extended functionality.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/portia-tools/local-mcp/supabase.mdx#_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+from portia import DefaultToolRegistry, McpToolRegistry, Portia, Config
+
+config = Config.from_default()
+tool_registry = DefaultToolRegistry(config) +  McpToolRegistry.from_stdio_connection(
+    server_name="supabase",
+    command="npx",
+    args=[
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--read-only",
+        "--project-ref=<project_ref>",
+    ],
+    env={"SUPABASE_ACCESS_TOKEN": "<personal_access_token>"},
+)
+
+portia = Portia(config=config, tools=tool_registry)
+```
+
+----------------------------------------
+
+TITLE: Configure OpenAI API Key
+DESCRIPTION: Sets the environment variable for the OpenAI API key. This is required to authenticate with OpenAI services.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_2
+
+LANGUAGE: bash
+CODE:
+```
+export OPENAI_API_KEY='your-api-key-here'
+```
+
+----------------------------------------
+
+TITLE: Generated Plan JSON Example
+DESCRIPTION: An example of a JSON object representing a generated plan, including its ID, context, and a list of steps with tasks, inputs, tool IDs, and outputs.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/Manage config options.md#_snippet_27
+
+LANGUAGE: json
+CODE:
+```
+{
+    "id": "plan-72cb538e-6d2b-42ca-a6c2-511a9a4c4f0e",
+    "plan_context": {
+        "query": "Which stock price grew faster in 2024, Amazon or Google?",
+        "tool_ids": [
+            "calculator_tool",
+            "weather_tool",
+            "search_tool"
+        ]
+    },
+    "steps": [
+        {
+            "task": "Search for the stock price growth of Amazon in 2024.",
+            "inputs": [],
+            "tool_id": "search_tool",
+            "output": "$amazon_stock_growth_2024"
+        },
+        {
+            "task": "Search for the stock price growth of Google in 2024.",
+            "inputs": [],
+            "tool_id": "search_tool",
+            "output": "$google_stock_growth_2024"
+        },
+        {
+            "task": "Compare the stock price growth of Amazon and Google in 2024.",
+            "inputs": [
+                {
+                    "name": "$amazon_stock_growth_2024",
+                    "description": "The stock price growth of Amazon in 2024."
+                },
+                {
+                    "name": "$google_stock_growth_2024",
+                    "description": "The stock price growth of Google in 2024."
+                }
+            ],
+            "tool_id": "llm_tool",
+            "output": "$faster_growth"
+        }
+    ]
+}
+```
+
+----------------------------------------
+
+TITLE: Install Slack App
+DESCRIPTION: Steps to create a Slack application, obtain credentials, and configure necessary permissions and redirect URLs for integration with Portia AI.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/_lib/_tool-intro-slack.mdx#_snippet_0
+
+LANGUAGE: markdown
+CODE:
+```
+1. Head over to <a href="https://api.slack.com/apps" target="_blank">**api.slack.com/apps** ↗**
+2. Create an app from scratch and select the Slack workplace you would like to use it in.
+3. Note down the client ID and secret on the **Basic Information** page. We will need this in a couple of steps from now!
+4. In the **OAuth & Permissions** tab further down in the left hand nav, add as **Redirect URL** the following URL `https://api.portialabs.ai/api/v0/oauth/slack` (don't forget to hit that **Save URLs** button!).
+5. Under **Bot Token Scopes**, be sure to add the scopes
+    - `channels:history` -- View messages and other content in public channels that your Slack app has been added to.
+    - `channels:read` -- View basic information about public channels in a workspace.
+    - `chat:write` -- Send messages as *@\{your slack app name\}*.
+    - `users:read` -- View people in a workspace.
+6. Under **User Token Scopes**, be sure to add the scope `search:read` to support searching workplace content.
+7. Now scroll up to the top of the **OAuth & Permissions** page and hit the **Install to *\{your workplace name\}*** button.
+8. Once that is done, open your Slack app and hit 'Add apps` and be sure to select your new app.
+```
+
+----------------------------------------
+
+TITLE: Building a Plan with Structured LLM Tool
+DESCRIPTION: Illustrates how to build an execution plan using PlanBuilder. This example chains two steps: getting weather information and then summarizing it using the LLM tool with a structured output.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Plan and run workflows/Inputs and Outputs.md#_snippet_6
+
+LANGUAGE: python
+CODE:
+```
+from portia import PlanBuilder
+
+# Assuming 'weather_tool.id' and 'structured_llm_tool.id' are available
+plan = PlanBuilder(
+  "get the weather in london and summarize the weather"
+).step(
+  "get the weather in london", tool_id=weather_tool.id
+).step(
+  "summarize the weather", tool_id=structured_llm_tool.id
+).build()
+```
+
+----------------------------------------
+
+TITLE: Generated Plan Example
+DESCRIPTION: An example of a generated plan for comparing stock price growth, including tasks, inputs, and tool IDs.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Plan and run workflows/Run a plan.md#_snippet_0
+
+LANGUAGE: json
+CODE:
+```
+{
+  "id": "plan-1dcd74a4-0af5-490a-a7d0-0df4fd983977",
+  "plan_context": {
+    "query": "Which stock price grew faster, Amazon or Google?",
+    "tool_ids": [
+      "calculator_tool",
+      "weather_tool",
+      "search_tool"
+    ]
+  },
+  "steps": [
+    {
+      "task": "Search for the latest stock price growth data for Amazon.",
+      "inputs": [],
+      "tool_id": "search_tool",
+      "output": "$amazon_stock_growth"
+    },
+    {
+      "task": "Search for the latest stock price growth data for Google.",
+      "inputs": [],
+      "tool_id": "search_tool",
+      "output": "$google_stock_growth"
+    },
+    {
+      "task": "Compare the stock price growth of Amazon and Google.",
+      "inputs": [
+        {
+          "name": "$amazon_stock_growth",
+          "description": "The stock price growth data for Amazon."
+        },
+        {
+          "name": "$google_stock_growth",
+          "description": "The stock price growth data for Google."
+        }
+      ],
+      "tool_id": "llm_tool",
+      "output": "$stock_growth_comparison"
+    }
+  ]
+}
+```
+
+----------------------------------------
+
+TITLE: Chargebee MCP Server Setup
+DESCRIPTION: Sets up the Chargebee MCP server for integration. This involves creating an McpToolRegistry instance with the server name, command, and arguments to install and run the Chargebee MCP agent.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/portia-tools/local-mcp/chargebee.mdx#_snippet_0
+
+LANGUAGE: python
+CODE:
+```
+McpToolRegistry.from_stdio_connection(
+    server_name="chargebee",
+    command="npx",
+    args=["-y", "@chargebee/mcp@latest"],
+)
+```
+
+----------------------------------------
+
+TITLE: Plan Run JSON Example
+DESCRIPTION: An example of a JSON object representing a plan run in its final state, including its ID, associated plan ID, current step index, state, and detailed outputs for each step and the final output.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/Manage config options.md#_snippet_28
+
+LANGUAGE: json
+CODE:
+```
+{
+    "id": "prun-e3a77013-2bd4-459c-898c-6a8cc9e77d12",
+    "plan_id": "plan-72cb538e-6d2b-42ca-a6c2-511a9a4c4f0e",
+    "current_step_index": 2,
+    "state": "COMPLETE",
+    "outputs": {
+        "clarifications": [],
+        "step_outputs": {
+            "$amazon_stock_growth_2024": {
+                "value": "In 2024, Amazon's stock price reached an all-time high closing price of $214.10 in November, having risen consistently since the start of 2023. Analysts remain optimistic, with many maintaining a 'Buy' rating and predicting further growth. By the end of 2024, Amazon's stock was expected to continue its upward trend, with projections varying but generally positive. The latest closing stock price as of November 14, 2024, was $211.48, just below the all-time high of $214.10.",
+                "summary": null
+            },
+            "$google_stock_growth_2024": {
+                "value": "As of today, January 23, 2025, Google's stock has experienced an 18% increase since the beginning of the year, starting at $139.56 and trading at $164.74. Analysts predict the stock price to reach $208 by the end of 2024, marking a year-on-year growth rate of 49.03%. The forecast for the end of 2024 is an estimated increase of 18.18% from today's price.",
+                "summary": null
+            },
+            "$faster_growth": {
+                "value": "In 2024, Amazon's stock price growth was positive, reaching an all-time high closing price of $214.10 in November. Google's stock price growth in 2024 was also strong, with a year-on-year growth rate of 49.03% and a forecasted increase of 18.18% by the end of the year.",
+                "summary": null
+            }
+        },
+        "final_output": {
+            "value": "In 2024, Amazon's stock price growth was positive, reaching an all-time high closing price of $214.10 in November. Google's stock price growth in 2024 was also strong, with a year-on-year growth rate of 49.03% and a forecasted increase of 18.18% by the end of the year.",
+            "summary": null
+        }
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Process Stream with SteelThread
+DESCRIPTION: Process a stream of data using SteelThread. This example demonstrates how to set up a SteelThread instance and process a stream, utilizing built-in stream evaluators. Ensure your stream is configured in the Portia dashboard.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Evals and SteelThread/Quickstart.md#_snippet_2
+
+LANGUAGE: python
+CODE:
+```
+from portia import Config
+from steelthread.steelthread import SteelThread, StreamConfig
+from dotenv import load_dotenv
+
+
+load_dotenv(override=True)
+
+config = Config.from_default()
+
+# Setup SteelThread instance and process stream
+st = SteelThread()
+st.process_stream(
+    StreamConfig(
+        # The stream name is the name of the stream we created in the dashboard.
+        stream_name="your-stream-name-here",
+        config=config,
+    )
+)
+```
+
+----------------------------------------
+
+TITLE: Complete Portia Project Setup with Monday.com Integration
+DESCRIPTION: Demonstrates how to equip a Portia instance with tools from both the default registry and the monday.com MCP server. This allows for combined functionality and seamless data management.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/portia-tools/local-mcp/monday.com.mdx#_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+from portia import DefaultToolRegistry, McpToolRegistry, Portia, Config
+
+config = Config.from_default()
+tool_registry = DefaultToolRegistry(config) +  McpToolRegistry.from_stdio_connection(
+    server_name="monday.com",
+    command="npx",
+    args=[
+        "@mondaydotcomorg/monday-api-mcp",
+        "-t",
+        "<api_key>",
+    ],
+)
+
+portia = Portia(config=config, tools=tool_registry)
+```
+
+----------------------------------------
+
+TITLE: Portia E2E Web Scraping Example
+DESCRIPTION: This Python script demonstrates a full end-to-end example of using Portia to scrape a website. It initializes Portia with a BrowserTool, defines a task to get a news headline, runs the task, and handles any necessary clarifications, such as user authentication, before resuming the plan.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Extend and run tools/Browser based tools.md#_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+from dotenv import load_dotenv
+
+from portia import (
+    ActionClarification,
+    Config,
+    PlanRunState,
+    Portia,
+)
+from portia.open_source_tools.browser_tool import BrowserTool
+
+load_dotenv(override=True)
+
+task = "Get the top news headline from the BBC news website (https://www.bbc.co.uk/news)"
+
+portia = Portia(Config.from_default(), tools=[BrowserTool()])
+
+plan_run = portia.run(task)
+
+while plan_run.state == PlanRunState.NEED_CLARIFICATION:
+    # If clarifications are needed, resolve them before resuming the workflow
+    print("\nPlease resolve the following clarifications to continue")
+    for clarification in plan_run.get_outstanding_clarifications():
+        # Handling of Action clarifications
+        if isinstance(clarification, ActionClarification):
+            print(f"{clarification.user_guidance} -- Please click on the link below to proceed.")
+            print(clarification.action_url)
+            input("Press Enter to continue...")
+
+    # Once clarifications are resolved, resume the workflow
+    plan_run = portia.resume(plan_run)
+```
+
+----------------------------------------
+
+TITLE: Portia Plan Execution Example
+DESCRIPTION: Shows a generated plan for searching and starring a GitHub repository, followed by the final state of the plan run, including clarification outputs and step results.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Handle auth and clarifications/Run Portia tools with authentication.md#_snippet_4
+
+LANGUAGE: json
+CODE:
+```
+{
+    "id": "plan-71fbe578-0c3f-4266-b5d7-933e8bb10ef2",
+    "plan_context": {
+        "query": "Find the github repository of PortiaAI and give it a star for me",
+        "tool_ids": [
+        "portia::github::search_repos",
+        "portia::github::star_repo",
+        "portia::slack::send_message",
+        "portia::zendesk::list_groups_for_user",
+        ...
+        ]
+    },
+    "steps": [
+        {
+            "task": "Search for the GitHub repository of PortiaAI",
+            "inputs": [],
+            "tool_id": "portia:github::search_repos",
+            "output": "$portiaai_repository"
+        },
+        {
+        "task": "Star the GitHub repository of PortiaAI",
+        "inputs": [
+            {
+                "name": "$portiaai_repository",
+                "description": "The GitHub repository of PortiaAI"
+            }
+        ],
+        "tool_id": "portia:github::star_repo",
+        "output": "$star_result"
+        }
+    ]
+}
+```
+
+LANGUAGE: json
+CODE:
+```
+{
+    "id": "prun-36945fae-1dcc-4b05-9bc4-4b862748e031",
+    "plan_id": "plan-71fbe578-0c3f-4266-b5d7-933e8bb10ef2",
+    "current_step_index": 1,
+    "state": "COMPLETE",
+    "outputs": {
+        "clarifications": [
+            {
+                "uuid": "clar-f873b9be-10ee-4184-a717-3a7559416499",
+                "category": “Multiple Choice”,
+                "response": “portiaAI/portia-sdk-python",
+                "step": 2, 
+                "user_guidance": "Please select a repository.", 
+                "handled": true,
+                "argument": "$portiaai_repository",
+                "options": "[\"portiaAI/portia-sdk-python\", \"portiaAI/docs\", \"portiaAI/portia-agent-examples\"]",
+            }
+        ],
+        "step_outputs": {
+        "$portiaai_repository": {
+            "value": "[\"portiaAI/portia-sdk-python\", \"portiaAI/docs\", \"portiaAI/portia-agent-examples\"]",
+            "summary": null
+        },
+        "$star_result": {
+            "value": "Successfully starred the repository 'portiaAI/portia-sdk-python'.",
+            "summary": null
+        }
+        },
+        "final_output": {
+        "value": "Successfully starred the repository 'portiaAI/portia-sdk-python'.",
+        "summary": null
+        }
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Install Browserbase Dependencies
+DESCRIPTION: Installs the necessary dependency group for using Browserbase infrastructure with Portia. Alternatively, the 'all' dependency group can be installed.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Extend and run tools/Browser based tools.md#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+pip install "portia-sdk-python[tools-browser-browserbase]"
+# Alternatively, install our 'all' dependency group to get everything
+pip install "portia-sdk-python[all]"
+```
+
+----------------------------------------
+
+TITLE: Create Dataset with Portia Query
+DESCRIPTION: Create a dataset by running a Portia query that reads user feedback from a local file and identifies recurring themes and areas of concern.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Evals and SteelThread/Quickstart.md#_snippet_1
+
+LANGUAGE: python
+CODE:
+```
+from portia import Portia
+
+path = "./uxr/calorify.txt" # TODO: change to your desired path
+query =f"Read the user feedback notes in local file {path}, \            and call out recurring themes in their feedback. \                Use lots of ⚠️ emojis when highlighting areas of concern."
+
+Portia().run(query=query)
+```
+
+----------------------------------------
+
+TITLE: Azure OpenAI Configuration for Portia AI
+DESCRIPTION: Sets up Portia AI to use Azure OpenAI services with the GPT-4o model. It shows how to configure the API key and endpoint using environment variables.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_20
+
+LANGUAGE: python
+CODE:
+```
+import os
+from dotenv import load_dotenv
+from portia import (
+    Config,
+    LLMProvider,
+    Portia,
+    example_tool_registry,
+)
+
+load_dotenv()
+AZURE_OPENAI_API_KEY = os.getenv('AZURE_OPENAI_API_KEY')
+AZURE_OPENAI_ENDPOINT = os.getenv('AZURE_OPENAI_ENDPOINT')
+
+# Create a default Portia config with LLM provider set to Azure OpenAI and model to GPT 4o
+azure_config = Config.from_default(
+    llm_provider=LLMProvider.AZURE_OPENAI,
+    default_model="azure-openai/gpt-4o",
+    azure_openai_api_key=AZURE_OPENAI_API_KEY,
+    azure_openai_endpoint=AZURE_OPENAI_ENDPOINT,
+)
+# Instantiate a Portia instance. Load it with the config and with the example tools.
+portia = Portia(config=azure_config, tools=example_tool_registry)
+# Run the test query and print the output!
+plan_run = portia.run('add 1 + 2')
+print(plan_run.model_dump_json(indent=2))
+```
+
+----------------------------------------
+
+TITLE: Configure Anthropic API Key
+DESCRIPTION: Sets the environment variable for the Anthropic API key. This is required to authenticate with Anthropic services.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+export ANTHROPIC_API_KEY='your-api-key-here'
+```
+
+----------------------------------------
+
+TITLE: Replace LLMTool with Google Model
+DESCRIPTION: Provides an example of configuring the LLMTool to use a Google model. The process includes environment loading, configuration setup, and updating the tool registry.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/Manage config options.md#_snippet_21
+
+LANGUAGE: python
+CODE:
+```
+import dotenv
+from portia import Config, DefaultToolRegistry, LLMTool, Portia
+
+dotenv.load_dotenv()
+
+config = Config.from_default()
+
+tool_registry = DefaultToolRegistry(config).replace_tool(
+    LLMTool(model="google/gemini-2.0-flash")
+)
+
+portia = Portia(config=config, tools=tool_registry)
+```
+
+----------------------------------------
+
+TITLE: Setup Portia for Cloud Storage and Run Plans
+DESCRIPTION: Demonstrates how to configure Portia for cloud storage, create a plan, and run it either directly from the object or by loading it from cloud storage using its UUID. It includes loading environment variables for API keys and handling potential exceptions during plan storage.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Plan and run workflows/Run a plan.md#_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+from portia.plan import PlanBuilder, PlanUUID
+from portia import Portia
+from uuid import UUID
+portia = Portia()
+plan = PlanBuilder("test").build()
+plan_id = PlanUUID(uuid=UUID("f8003b53-9b62-44e2-ac67-887146c07949"))
+plan.id = plan_id
+try:
+  if not portia.storage.get_plan(plan_id):
+    portia.storage.save_plan(plan)
+except Exception as e:
+  pass
+```
+
+LANGUAGE: python
+CODE:
+```
+from dotenv import load_dotenv
+from portia import (
+    Portia,
+    default_config,
+    Config,
+    StorageClass,
+    PlanUUID
+)
+
+# Load the Portia API key
+load_dotenv()
+
+# Set up the Portia instance to use cloud storage
+config = Config.from_default(storage_class=StorageClass.CLOUD)
+portia = Portia(config=config)
+
+# This will create a plan that is stored in Portia Cloud
+plan = portia.plan('Which stock price grew faster in 2024, Amazon or Google?')
+
+# We can then either run the plan directly from the object...
+run = portia.run_plan(plan=plan)
+
+# Or we can use the ID so that the plan is loaded from storage
+run = portia.run_plan(plan=PlanUUID.from_string("plan-f8003b53-9b62-44e2-ac67-887146c07949"))
+```
+
+----------------------------------------
+
+TITLE: Configure Azure OpenAI API Keys
+DESCRIPTION: Sets the environment variables for Azure OpenAI API key and endpoint. These are required for authenticating with Azure OpenAI services.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/install.md#_snippet_6
+
+LANGUAGE: bash
+CODE:
+```
+export AZURE_OPENAI_API_KEY='your-api-key-here'
+export AZURE_OPENAI_ENDPOINT='your-api-key-here'
+```
+
+----------------------------------------
+
+TITLE: List Tools CLI Example
+DESCRIPTION: Demonstrates how to list available tools using the Portia CLI, requiring an API key.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/portia-tools/remote-mcp/firecrawl.mdx#_snippet_0
+
+LANGUAGE: bash
+CODE:
+```
+$ PORTIA_API_KEY=<your-api-key> portia-cli list-tools
+```
+
+----------------------------------------
+
+TITLE: Example JSON Output for Plan Run and Plan
+DESCRIPTION: Provides an example of the JSON output expected when serializing Portia plan run and plan objects. This output shows the structure and typical data contained within these objects.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Plan and run workflows/Manage plan run states on Portia cloud.md#_snippet_3
+
+LANGUAGE: bash
+CODE:
+```
+Retrieved plan run:
+{
+  "id": "prun-f66b141b-5603-4bd9-b827-0c7a41bf5d5c",
+  "plan_id": "plan-1eee4bbf-361a-41be-bab7-6dd86a247f48",
+  "current_step_index": 1,
+  "clarifications": [],
+  "state": "COMPLETE",
+  "step_outputs": {
+    "$weather_joke": {
+      "value": "Why did the weather go to therapy? It had too many issues to cloud its mind!"
+    },
+    "$london_temperature": {
+      "value": "The current weather in London is overcast clouds with a temperature of 0.91°C."
+    }
+  },
+  "final_output": {
+    "value": "Why did the weather go to therapy? It had too many issues to cloud its mind!"
+  }
+}
+Retrieved plan:
+{
+  "id": "plan-1eee4bbf-361a-41be-bab7-6dd86a247f48",
+  "query": "Get the temperature in London and share it with a light joke",
+  "steps": [
+    {
+      "task": "Get the current temperature in London.",
+      "inputs": [],
+      "tool_id": "weather_tool",
+      "output": "$london_temperature"
+    },
+    {
+      "task": "Generate a light joke about the weather.",
+      "inputs": [
+        {
+          "name": "$london_temperature",
+          "description": "The current temperature in London."
+        }
+      ],
+      "tool_id": "llm_tool",
+      "output": "$weather_joke"
+    }
+  ]
+}
+```
+
+----------------------------------------
+
+TITLE: Google Calendar Get Events By Properties Tool
+DESCRIPTION: Retrieves Google Calendar events based on specified properties. Supports filtering by event title, start and end times, description, and attendees. Allows setting a maximum number of results.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/portia-tools/portia-cloud/google-calendar/calendar-get-events-by-properties.mdx#_snippet_0
+
+LANGUAGE: APIDOC
+CODE:
+```
+Tool ID: portia:google:gcalendar:get_events_by_properties
+
+Tool description: Gets Google Calendar events by properties, returning the matching event details. You do not need to provide all the properties, only the ones you have provided with.
+
+Args schema:
+{
+  "description": "Schema for getting a Google Calendar events by properties.",
+  "properties": {
+    "event_title": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The title of the event to get",
+      "title": "Event Title"
+    },
+    "start_time": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "default": "1970-01-01T00:00:00",
+      "description": "The earliest time of the events to get in ISO format without timezone, e.g 2024-09-20T20:00:00",
+      "title": "Start Time"
+    },
+    "end_time": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "default": "2100-01-01T00:00:00",
+      "description": "The latest time of the events to get in ISO format without timezone, e.g 2024-09-20T20:00:00",
+      "title": "End Time"
+    },
+    "event_description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The description of the events to get",
+      "title": "Event Description"
+    },
+    "attendees": {
+      "default": [],
+      "description": "The attendees' of the events to get",
+      "items": {
+        "type": "string"
+      },
+      "title": "Attendees",
+      "type": "array"
+    },
+    "max_results": {
+      "default": 10,
+      "description": "The maximum number of events to return",
+      "title": "Max Results",
+      "type": "integer"
+    }
+  },
+  "title": "GoogleCalendarGetEventsByPropertiesSchema",
+  "type": "object"
+}
+
+Output schema:
+('list[dict]', 'A list of dictionaries containing information about matching calendar events')
+```
+
+----------------------------------------
+
+TITLE: Initialize Portia Client with Tool Stubs
+DESCRIPTION: Initializes a Portia client with a custom configuration, including a ToolStubRegistry that maps tool names to their stub response functions. This allows Portia to use mocked tool behaviors during execution.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Evals and SteelThread/Quickstart.md#_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+config = Config.from_default()
+
+# Add the tool stub definition to your Portia client using a ToolStubRegistry
+portia = Portia(
+    config,
+    tools=ToolStubRegistry(
+        DefaultToolRegistry(config),
+        stubs={
+            "file_reader_tool": file_reader_stub_response,
+        },
+    ),
+)
+```
+
+----------------------------------------
+
+TITLE: Run Browser Automation Example
+DESCRIPTION: This command executes the Python script for browser automation. Ensure all Chrome instances are closed before running. The script will launch Chrome with debugging flags, navigate to LinkedIn, and allow user login before proceeding with automated tasks.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/A tour of our SDK.md#_snippet_15
+
+LANGUAGE: sh
+CODE:
+```
+uv run 4_browser_use.py
+```
+
+----------------------------------------
+
+TITLE: Instantiate and Configure Portia Runner
+DESCRIPTION: Demonstrates how to instantiate the Portia runner by loading default configuration from the environment, including Portia cloud tools, and integrating CLIExecutionHooks for user interaction.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/A tour of our SDK.md#_snippet_4
+
+LANGUAGE: python
+CODE:
+```
+# Instantiate a Portia runner.
+# Load it with the default config from the environment, and with Portia cloud tools.
+# Use the CLIExecutionHooks to allow the user to provide input to the agents via the CLI when needed
+my_config = Config.from_default(storage_class=StorageClass.CLOUD)
+portia = Portia(
+   config=my_config,
+   tools=PortiaToolRegistry(my_config),
+   execution_hooks=CLIExecutionHooks(),
+)
+```
+
+----------------------------------------
+
+TITLE: Configure LLMProvider with Google
+DESCRIPTION: Provides examples for setting up the LLMProvider for Google, including enum, string, and environment variable methods.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Get started/Manage config options.md#_snippet_5
+
+LANGUAGE: python
+CODE:
+```
+from portia import LLMProvider, Config
+
+config = Config.from_default(llm_provider=LLMProvider.GOOGLE)
+```
+
+LANGUAGE: python
+CODE:
+```
+from portia import LLMProvider, Config
+
+config = Config.from_default(llm_provider="google")
+```
+
+LANGUAGE: python
+CODE:
+```
+from portia import LLMProvider, Config
+
+config = Config.from_default()  # config.llm_provider => LLMProvider.GOOGLE
+```
+
+----------------------------------------
+
+TITLE: Combine Tool Registries and Run Portia
+DESCRIPTION: Demonstrates combining local and example tool registries using the '+' operator and then executing a plan with the combined registry. It sets up Portia with a specific configuration and log level, runs a query to get weather information for a town with the longest Welsh name, and writes the output to a file. Finally, it prints the serialized plan run output.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Extend and run tools/Adding custom tools.md#_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+from dotenv import load_dotenv
+from portia import (
+    Portia,
+    example_tool_registry,
+    Config,
+    LogLevel,
+)
+
+load_dotenv()
+
+# Load example and custom tool registries into a single one
+complete_tool_registry = example_tool_registry + my_tool_registry
+# Instantiate Portia with the tools above
+portia = Portia(
+    Config.from_default(default_log_level=LogLevel.DEBUG),
+    tools=complete_tool_registry,
+)
+
+# Execute the plan from the user query
+plan_run = portia.run('Get the weather in the town with the longest name in Welsh'
+                                + ' and write it to demo_runs/weather.txt.')
+
+# Serialise into JSON and print the output
+print(plan_run.model_dump_json(indent=2))
+```
+
+----------------------------------------
+
+TITLE: BrowserTool Example
+DESCRIPTION: An example of using the general BrowserTool with Portia to perform a web-based task. This requires BrowserBase API key and project ID to be set.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Extend and run tools/Browser based tools.md#_snippet_3
+
+LANGUAGE: python
+CODE:
+```
+from portia import Config, Portia
+from portia.open_source_tools.browser_tool import BrowserTool
+
+task = "Find my connections called 'Bob' on LinkedIn (https://www.linkedin.com)"
+
+# Needs BrowserBase API key and project_id
+portia = Portia(config=Config.from_default(),
+                tools=[BrowserTool()])
+```
+
+----------------------------------------
+
+TITLE: Plan Run in Final State Example
+DESCRIPTION: An example of a PlanRun object in its final state after execution, showing the plan ID, current step, state, and outputs.
+
+SOURCE: https://github.com/portiaai/docs/blob/main/docs/product/Plan and run workflows/Run a plan.md#_snippet_1
+
+LANGUAGE: json
+CODE:
+```
+{
+  "id": "prun-18d9aa91-0066-413f-af32-b979bce89821",
+  "plan_id": "plan-a89efeb0-51ef-4f2c-b435-a936c27c3cfc",
+  "current_step_index": 2,
+  "state": "COMPLETE",
+  "outputs": {
+    "clarifications": [],
+    "step_outputs": {
+      "$amazon_stock_growth": {
+        "value": "Amazon stock closed at an all-time high of $214.10 in November...",
+        "summary": null
+      },
+      "$google_stock_growth": {
+        "value": "In 2024, Google's parent company Alphabet surged 35.5% according to...",
+        "summary": null
+      },
+      "$faster_growth": {
+        "value": "In 2024, Amazon's stock price grew by 52%, while Google's parent company Alphabet saw a stock price surge of 35.5%.",
+        "summary": null
+      }
+    },
+    "final_output": {
+      "value": "In 2024, Amazon's stock price grew by 52%, while Google's parent company Alphabet saw a stock price surge of 35.5%.",
+      "summary": null
+    }
+  }
+}
+```
+========================
+CODE SNIPPETS
+========================
+TITLE: Portia AI Example Files Overview
+DESCRIPTION: This table outlines the example Python files provided in the Portia AI getting started tour. Each entry specifies the filename, its primary focus, and the key features it introduces to the user.
+
+SOURCE: https://docs.portialabs.ai/getting-started-tour
+
+LANGUAGE: markdown
+CODE:
+```
+Example File | Focus | Features Introduced  
+---|---|---
+`1_github_oauth.py` | OAuth API use | OAuth, basic agent commands  
+`2_tools_end_users_llms.py` | Multi-tool agent | End users, multi-step reasoning  
+`3_mcp.py` | Running MCP Tools | MCP format, structured execution  
+`4_browser_use.py` | Web automation | Browser automation, local & remote modes  
+```
+
+----------------------------------------
+
+TITLE: Install SteelThread with uv
+DESCRIPTION: Adds the steel-thread library as a dependency using the uv package manager.
+
+SOURCE: https://docs.portialabs.ai/steel-thread-quickstart
+
+LANGUAGE: bash
+CODE:
+```
+uv add steel-thread  
+```
+
+----------------------------------------
+
+TITLE: Install SteelThread with Poetry
+DESCRIPTION: Adds the steel-thread library as a dependency using the Poetry package manager.
+
+SOURCE: https://docs.portialabs.ai/steel-thread-quickstart
+
+LANGUAGE: bash
+CODE:
+```
+poetry add steel-thread  
+```
+
+----------------------------------------
+
+TITLE: Test Installation from Python (OpenAI)
+DESCRIPTION: Tests the Portia installation by running a query from a Python script using OpenAI as the LLM provider. Requires setting OPENAI_API_KEY in a .env file.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: python
+CODE:
+```
+from dotenv import load_dotenv
+from portia import(
+    Portia,
+    default_config,
+    example_tool_registry,
+)
+
+load_dotenv()
+
+# Instantiate Portia with the default config which uses Open AI, and with some example tools. 
+portia = Portia(tools=example_tool_registry)
+# Run the test query and print the output!
+plan_run = portia.run('add 1 + 2')
+print(plan_run.model_dump_json(indent=2))
+```
+
+----------------------------------------
+
+TITLE: Install Portia SDK with Extra Dependencies
+DESCRIPTION: Installs the Portia SDK with additional dependencies for specific LLM providers. Use '[all]' for all providers, or specify individual providers like '[amazon]', '[google]', or '[mistral]'.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+pip install"portia-sdk-python[all]"
+# Or only with Amazon Bedrock extra dependencies
+pip install"portia-sdk-python[amazon]"
+# Or only with Google GenAI extra dependencies
+pip install"portia-sdk-python[google]"
+# Or only with Mistral extra dependencies
+pip install"portia-sdk-python[mistral]"
+```
+
+----------------------------------------
+
+TITLE: Create a Dataset with Portia
+DESCRIPTION: Runs a Portia query to process user feedback from a local file and identify recurring themes. Requires a PORTIA_API_KEY environment variable.
+
+SOURCE: https://docs.portialabs.ai/steel-thread-quickstart
+
+LANGUAGE: python
+CODE:
+```
+from portia import Portia  
+
+path ="./uxr/calorify.txt"# TODO: change to your desired path  
+query =f"Read the user feedback notes in local file{path}, \  
+and call out recurring themes in their feedback. \  
+                Use lots of ⚠️ emojis when highlighting areas of concern."
+
+Portia().run(query=query)  
+```
+
+----------------------------------------
+
+TITLE: Test Installation from Python (Mistral)
+DESCRIPTION: Tests the Portia installation by running a query from a Python script using Mistral AI as the LLM provider. Requires setting MISTRAL_API_KEY in a .env file.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: python
+CODE:
+```
+import os
+from dotenv import load_dotenv
+from portia import(
+    Config,
+    LLMProvider,
+    Portia,
+    example_tool_registry,
+)
+
+load_dotenv()
+MISTRAL_API_KEY = os.getenv('MISTRAL_API_KEY')
+
+
+```
+
+----------------------------------------
+
+TITLE: Run Portia CLI with Default (OpenAI)
+DESCRIPTION: Executes a basic prompt using the Portia CLI with OpenAI as the default LLM provider. This is a fundamental test to ensure the installation is working correctly.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+portia-cli run "add 1 + 2"
+```
+
+----------------------------------------
+
+TITLE: Install SteelThread with Pip
+DESCRIPTION: Installs the steel-thread library using the pip package manager.
+
+SOURCE: https://docs.portialabs.ai/steel-thread-quickstart
+
+LANGUAGE: bash
+CODE:
+```
+pip install steel-thread  
+```
+
+----------------------------------------
+
+TITLE: Process a Stream with SteelThread
+DESCRIPTION: Processes a stream of data using SteelThread, leveraging built-in evaluators. Requires a configured stream in the Portia dashboard and a PORTIA_API_KEY.
+
+SOURCE: https://docs.portialabs.ai/steel-thread-quickstart
+
+LANGUAGE: python
+CODE:
+```
+from portia import Config  
+from steelthread.steelthread import SteelThread, StreamConfig  
+from dotenv import load_dotenv  
+
+
+load_dotenv(override=True)  
+
+config = Config.from_default()  
+
+# Setup SteelThread instance and process stream  
+st = SteelThread()  
+st.process_stream(  
+    StreamConfig(  
+# The stream name is the name of the stream we created in the dashboard.  
+        stream_name="your-stream-name-here",  
+        config=config,  
+)  
+)  
+```
+
+----------------------------------------
+
+TITLE: Test Installation from Python (Anthropic)
+DESCRIPTION: Tests the Portia installation by running a query from a Python script using Anthropic as the LLM provider. Requires setting ANTHROPIC_API_KEY in a .env file and configuring the model.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: python
+CODE:
+```
+import os
+from dotenv import load_dotenv
+from portia import(
+    Config,
+    LLMProvider,
+    Portia,
+    example_tool_registry,
+)
+
+load_dotenv()
+ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY')
+
+# Create a default Portia config with LLM provider set to Anthropic and to the Sonnet 3.5 model
+anthropic_config = Config.from_default(
+    llm_provider=LLMProvider.ANTHROPIC,
+    default_model="anthropic/claude-3-5-sonnet-latest",
+    anthropic_api_key=ANTHROPIC_API_KEY
+)
+# Instantiate a Portia instance. Load it with the config and with the example tools. 
+portia = Portia(config=anthropic_config, tools=example_tool_registry)
+# Run the test query and print the output!
+plan_run = portia.run('add 1 + 2')
+print(plan_run.model_dump_json(indent=2))
+```
+
+----------------------------------------
+
+TITLE: Install Portia Python SDK
+DESCRIPTION: Installs the Portia SDK and its core dependencies using pip. For alternative package managers like Poetry or uv, use their respective add commands.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+pip install portia-sdk-python
+```
+
+----------------------------------------
+
+TITLE: Run Example Script
+DESCRIPTION: Command to execute the Python script containing the Portia browser automation example.
+
+SOURCE: https://docs.portialabs.ai/getting-started-tour
+
+LANGUAGE: shell
+CODE:
+```
+uv run 4_browser_use.py
+```
+
+----------------------------------------
+
+TITLE: Run Test Query with Portia SDK
+DESCRIPTION: Executes a test query using the Portia SDK and prints the JSON output. This snippet demonstrates a basic interaction with the Portia library for running queries and inspecting results.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: python
+CODE:
+```
+plan_run = portia.run('add 1 + 2')
+print(plan_run.model_dump_json(indent=2))
+```
+
+----------------------------------------
+
+TITLE: Complete Portia Project Setup with Chargebee
+DESCRIPTION: Provides a complete example of equipping a Portia instance with Chargebee MCP tools alongside default tools. It shows the instantiation of Config, DefaultToolRegistry, McpToolRegistry, and the Portia class.
+
+SOURCE: https://docs.portialabs.ai/portia-tools/local-mcp/chargebee
+
+LANGUAGE: python
+CODE:
+```
+from portia import DefaultToolRegistry, McpToolRegistry, Portia, Config
+
+config = Config.from_default()
+tool_registry = DefaultToolRegistry(config)+ McpToolRegistry.from_stdio_connection(
+    server_name="chargebee",
+    command="npx",
+    args=["-y","@chargebee/mcp@latest"],
+)
+
+portia = Portia(config=config, tools=tool_registry)
+```
+
+----------------------------------------
+
+TITLE: Run Portia CLI with Anthropic
+DESCRIPTION: Executes a basic prompt using the Portia CLI, specifically targeting the Anthropic LLM provider. This demonstrates how to switch providers via the command line.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+portia-cli run --llm-provider="anthropic""add 1 + 2"
+```
+
+----------------------------------------
+
+TITLE: Configure Portia with Google GenAI
+DESCRIPTION: Sets up Portia with Google GenAI, using the Gemini 2.0 Flash model. Requires GOOGLE_API_KEY to be set in the environment.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: python
+CODE:
+```
+import os
+from dotenv import load_dotenv
+from portia import (
+    Config,
+    LLMProvider,
+    Portia,
+    example_tool_registry,
+)
+
+load_dotenv()
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+
+# Create a default Portia config with LLM provider set to Google GenAI and model set to Gemini 2.0 Flash
+google_config = Config.from_default(
+    llm_provider=LLMProvider.GOOGLE,
+    default_model="google/gemini-2.0-flash",
+    google_api_key=GOOGLE_API_KEY
+)
+# Instantiate a Portia instance. Load it with the config and with the example tools.
+portia = Portia(config=google_config, tools=example_tool_registry)
+# Run the test query and print the output!
+plan_run = portia.run('add 1 + 2')
+print(plan_run.model_dump_json(indent=2))
+```
+
+----------------------------------------
+
+TITLE: Configure Google GenAI API Key
+DESCRIPTION: Sets the environment variable for the Google GenAI API key. 'gemini-2.5-pro' and 'gemini-2.5-flash' are used by default. Ensure Google GenAI dependencies are installed.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+export GOOGLE_API_KEY='your-api-key-here'
+```
+
+----------------------------------------
+
+TITLE: End-to-End Example with Clarification Handling
+DESCRIPTION: A full example demonstrating how to run a task using BrowserTool and handle ActionClarifications, including user guidance and resuming the plan.
+
+SOURCE: https://docs.portialabs.ai/browser-tools
+
+LANGUAGE: python
+CODE:
+```
+from dotenv import load_dotenv
+
+from portia import(
+    ActionClarification,
+    Config,
+    PlanRunState,
+    Portia,
+)
+from portia.open_source_tools.browser_tool import BrowserTool
+
+load_dotenv(override=True)
+
+task ="Get the top news headline from the BBC news website (https://www.bbc.co.uk/news)"
+
+portia = Portia(Config.from_default(), tools=[BrowserTool()])
+
+plan_run = portia.run(task)
+
+while plan_run.state == PlanRunState.NEED_CLARIFICATION:
+# If clarifications are needed, resolve them before resuming the workflow
+    print("\nPlease resolve the following clarifications to continue")
+    for clarification in plan_run.get_outstanding_clarifications():
+# Handling of Action clarifications
+        if isinstance(clarification, ActionClarification):
+            print(f"{clarification.user_guidance} -- Please click on the link below to proceed.")
+            print(clarification.action_url)
+            input("Press Enter to continue...")
+
+# Once clarifications are resolved, resume the workflow
+    plan_run = portia.resume(plan_run)
+```
+
+----------------------------------------
+
+TITLE: Run Portia CLI with Google GenAI
+DESCRIPTION: Executes a basic prompt using the Portia CLI, specifically targeting the Google Generative AI provider. This allows testing integration with Google's AI services.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+portia-cli run --llm-provider="google""add 1 + 2"
+```
+
+----------------------------------------
+
+TITLE: Complete Portia Setup with Shopify Dev
+DESCRIPTION: Provides a complete example of equipping a Portia instance with Shopify Dev tools alongside default tools. It shows the instantiation of Config, DefaultToolRegistry, McpToolRegistry, and Portia.
+
+SOURCE: https://docs.portialabs.ai/portia-tools/local-mcp/shopify-dev
+
+LANGUAGE: python
+CODE:
+```
+from portia import DefaultToolRegistry, McpToolRegistry, Portia, Config
+
+config = Config.from_default()
+tool_registry = DefaultToolRegistry(config) + McpToolRegistry.from_stdio_connection(
+    server_name="shopify-dev",
+    command="npx",
+    args=["@shopify/dev-mcp@latest"],
+)
+
+portia = Portia(config=config, tools=tool_registry)
+```
+
+----------------------------------------
+
+TITLE: Configure Portia with Azure OpenAI
+DESCRIPTION: Sets up Portia with Azure OpenAI, using the GPT-4o model. Requires AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT to be set in the environment.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: python
+CODE:
+```
+import os
+from dotenv import load_dotenv
+from portia import (
+    Config,
+    LLMProvider,
+    Portia,
+    example_tool_registry,
+)
+
+load_dotenv()
+AZURE_OPENAI_API_KEY = os.getenv('AZURE_OPENAI_API_KEY')
+AZURE_OPENAI_ENDPOINT = os.getenv('AZURE_OPENAI_ENDPOINT')
+
+# Create a default Portia config with LLM provider set to Azure OpenAI and model to GPT 4o
+azure_config = Config.from_default(
+    llm_provider=LLMProvider.AZURE_OPENAI,
+    default_model="azure-openai/gpt-4o",
+    azure_openai_api_key=AZURE_OPENAI_API_KEY,
+    azure_openai_endpoint=AZURE_OPENAI_ENDPOINT,
+)
+# Instantiate a Portia instance. Load it with the config and with the example tools.
+portia = Portia(config=azure_config, tools=example_tool_registry)
+```
+
+----------------------------------------
+
+TITLE: Run Portia CLI with Azure OpenAI
+DESCRIPTION: Executes a basic prompt using the Portia CLI, specifically targeting the Azure OpenAI provider. This is useful for users leveraging Azure's OpenAI offerings.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+portia-cli run --llm-provider="azure-openai""add 1 + 2"
+```
+
+----------------------------------------
+
+TITLE: GitHub OAuth Integration Example - Portia SDK
+DESCRIPTION: An example of using Portia to integrate with third-party APIs via OAuth. This script shows how an agent can perform user-specific actions like starring GitHub repositories or checking Google Calendar availability.
+
+SOURCE: https://docs.portialabs.ai/getting-started-tour
+
+LANGUAGE: python
+CODE:
+```
+# File : 1_github_oauth.py
+# This is the most straightforward example of using Portia to connect to third-party APIs with OAuth.
+# It demonstrates how an agent can perform actions on behalf of a user, such as starring a GitHub repository or checking availability on their Google Calendar.
+
+# Key concepts:
+# * OAuth authentication for third-party services.
+# * Use of `Portia` with multiple tools.
+# * Simple command execution.
+```
+
+----------------------------------------
+
+TITLE: Run Portia CLI with Mistral
+DESCRIPTION: Executes a basic prompt using the Portia CLI, specifically targeting the Mistral AI LLM provider. This showcases the flexibility in choosing different AI models.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+portia-cli run --llm-provider="mistralai""add 1 + 2"
+```
+
+----------------------------------------
+
+TITLE: Configure Portia with Mistral AI
+DESCRIPTION: Sets up Portia with Mistral AI, using the latest Mistral Large model. Requires MISTRAL_API_KEY to be set in the environment.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: python
+CODE:
+```
+import os
+from dotenv import load_dotenv
+from portia import (
+    Config,
+    LLMProvider,
+    Portia,
+    example_tool_registry,
+)
+
+load_dotenv()
+MISTRAL_API_KEY = os.getenv('MISTRAL_API_KEY')
+
+# Create a default Portia config with LLM provider set to Mistral AI and the latest Mistral Large model
+mistral_config = Config.from_default(
+    llm_provider=LLMProvider.MISTRALAI,
+    default_model="mistralai/mistral-large-latest",
+    mistralai_api_key=MISTRAL_API_KEY
+)
+# Instantiate a Portia instance. Load it with the config and with the example tools.
+portia = Portia(config=mistral_config, tools=example_tool_registry)
+# Run the test query and print the output!
+plan_run = portia.run('add 1 + 2')
+print(plan_run.model_dump_json(indent=2))
+```
+
+----------------------------------------
+
+TITLE: Configure Mistral API Key
+DESCRIPTION: Sets the environment variable for the Mistral API key. 'mistral-large-latest' is the default model. Ensure Mistral dependencies are installed.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+export MISTRAL_API_KEY='your-api-key-here'
+```
+
+----------------------------------------
+
+TITLE: Plan JSON Example
+DESCRIPTION: An example of a plan definition in JSON format, outlining the steps, tools, and inputs required for execution.
+
+SOURCE: https://docs.portialabs.ai/run-plan
+
+LANGUAGE: json
+CODE:
+```
+{
+"id":"plan-1dcd74a4-0af5-490a-a7d0-0df4fd983977",
+"plan_context":{
+"query":"Which stock price grew faster, Amazon or Google?",
+"tool_ids":[
+"calculator_tool",
+"weather_tool",
+"search_tool"
+]
+},
+"steps":[
+{
+"task":"Search for the latest stock price growth data for Amazon.",
+"inputs":[],
+"tool_id":"search_tool",
+"output":"$amazon_stock_growth"
+},
+{
+"task":"Search for the latest stock price growth data for Google.",
+"inputs":[],
+"tool_id":"search_tool",
+"output":"$google_stock_growth"
+},
+{
+"task":"Compare the stock price growth of Amazon and Google.",
+"inputs":[
+{
+"name":"$amazon_stock_growth",
+"description":"The stock price growth data for Amazon."
+},
+{
+"name":"$google_stock_growth",
+"description":"The stock price growth data for Google."
+}
+],
+"tool_id":"llm_tool",
+"output":"$stock_growth_comparison"
+}
+]
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Amazon Bedrock Credentials
+DESCRIPTION: Sets the environment variables for AWS access key ID, secret access key, and default region for Amazon Bedrock. Ensure Amazon dependencies are installed.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+export AWS_ACCESS_KEY_ID ='your-access-key-id'
+export AWS_SECRET_ACCESS_KEY ='your-secret-access-key'
+export AWS_DEFAULT_REGION ='your-default-region'
+```
+
+----------------------------------------
+
+TITLE: Run Portia CLI with Amazon Bedrock
+DESCRIPTION: Executes a basic prompt using the Portia CLI, specifically targeting Amazon Bedrock for LLM access. This enables testing with AWS's managed AI services.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+portia-cli run --llm-provider="amazon""add 1 + 2"
+```
+
+----------------------------------------
+
+TITLE: Configure OpenAI API Key
+DESCRIPTION: Sets the environment variable for the OpenAI API key. 'gpt-4.1' is the default model.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+export OPENAI_API_KEY='your-api-key-here'
+```
+
+----------------------------------------
+
+TITLE: Configure Portia with Amazon Bedrock
+DESCRIPTION: Sets up Portia with Amazon Bedrock, using an Anthropic Claude Sonnet model. Supports configuration via AWS access keys or a credentials profile.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: python
+CODE:
+```
+import os
+from dotenv import load_dotenv
+from portia import (
+    Config,
+    LLMProvider,
+    Portia,
+    example_tool_registry,
+)
+
+load_dotenv()
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_DEFAULT_REGION = os.getenv('AWS_DEFAULT_REGION')
+
+# Create a default Portia config ussing aws access keys with LLM provider set to AMAZON and model set to anthropic within Bedrock (make sure you enable the model in your Bedrock model access settings).
+amazon_config = Config.from_default(
+    llm_provider=LLMProvider.AMAZON,
+    default_model="amazon/eu.anthropic.claude-sonnet-4-20250514-v1:0",
+    aws_access_key_id=AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+    aws_default_region=AWS_DEFAULT_REGION,
+)
+# Config using the aws_credentials_profile_name, if you're using ~/.aws/credentials (generated by `aws configure`).
+AWS_CREDENTIALS_PROFILE_NAME = os.getenv('AWS_CREDENTIALS_PROFILE_NAME')||"default"
+amazon_config2 = Config.from_default(
+    llm_provider=LLMProvider.AMAZON,
+    default_model="amazon/eu.anthropic.claude-sonnet-4-20250514-v1:0",
+    aws_credentials_profile_name=AWS_CREDENTIALS_PROFILE_NAME,
+)
+portia = Portia(config=amazon_config, tools=example_tool_registry)
+# Run the test query and print the output!
+plan_run = portia.run('add 1 + 2')
+print(plan_run.model_dump_json(indent=2))
+```
+
+----------------------------------------
+
+TITLE: Integrate Perplexity MCP Server with Portia
+DESCRIPTION: Provides a complete example of equipping a Portia instance with tools from the Perplexity MCP server, alongside default tools. It shows the setup of configuration, tool registries, and the Portia instance.
+
+SOURCE: https://docs.portialabs.ai/portia-tools/local-mcp/perplexity
+
+LANGUAGE: python
+CODE:
+```
+from portia import DefaultToolRegistry, McpToolRegistry, Portia, Config
+
+config = Config.from_default()
+tool_registry = DefaultToolRegistry(config)+ McpToolRegistry.from_stdio_connection(
+    server_name="perplexity-ask",
+    command="npx",
+    args=["-y","server-perplexity-ask"],
+    env={"PERPLEXITY_API_KEY":"<api_key>"},
+)
+
+
+portia = Portia(config=config, tools=tool_registry)
+```
+
+----------------------------------------
+
+TITLE: Configure Azure OpenAI API Key and Endpoint
+DESCRIPTION: Sets the environment variables for Azure OpenAI API key and endpoint. 'gpt-4.1' is the default model.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+export AZURE_OPENAI_API_KEY='your-api-key-here'
+export AZURE_OPENAI_ENDPOINT='your-api-key-here'
+```
+
+----------------------------------------
+
+TITLE: Check Python Version
+DESCRIPTION: Command to verify the installed Python version. Portia requires Python 3.11 or higher.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+python3 --version
+```
+
+----------------------------------------
+
+TITLE: Portia Plan Structure Example
+DESCRIPTION: An example JSON representation of a `Plan` object, illustrating its structure including ID, context, and a sequence of steps with tasks, inputs, tool IDs, and outputs.
+
+SOURCE: https://docs.portialabs.ai/generate-plan
+
+LANGUAGE: json
+CODE:
+```
+{
+"id":"plan-1dcd74a4-0af5-490a-a7d0-0df4fd983977",
+"plan_context":{
+"query":"Which stock price grew faster, Amazon or Google?",
+"tool_ids":["calculator_tool","weather_tool","search_tool"]
+},
+"steps":[
+{
+"task":"Search for the latest stock price growth data for Amazon.",
+"inputs":[],
+"tool_id":"search_tool",
+"output":"$amazon_stock_growth"
+},
+{
+"task":"Search for the latest stock price growth data for Google.",
+"inputs":[],
+"tool_id":"search_tool",
+"output":"$google_stock_growth"
+},
+{
+"task":"Compare the stock price growth of Amazon and Google.",
+"inputs":[
+{
+"name":"$amazon_stock_growth",
+"value":null,
+"description":"The stock price growth data for Amazon."
+},
+{
+"name":"$google_stock_growth",
+"value":null,
+"description":"The stock price growth data for Google."
+}
+],
+"tool_id":"llm_tool",
+"output":"$stock_growth_comparison"
+}
+]
+}
+```
+
+----------------------------------------
+
+TITLE: Python Example: Running Portia Tools
+DESCRIPTION: This snippet demonstrates the core functionality of the Portia library. It shows how to initialize Portia with default configurations and tools, generate an execution plan from a natural language query, and then execute that plan. It also includes logic to handle various clarification types (InputClarification, MultipleChoiceClarification, ActionClarification) that might arise during plan execution, allowing for user interaction or external actions.
+
+SOURCE: https://docs.portialabs.ai/run-portia-tools
+
+LANGUAGE: python
+CODE:
+```
+from dotenv import load_dotenv
+from portia import (
+    ActionClarification,
+    InputClarification,
+    MultipleChoiceClarification,
+    PlanRunState,
+    Portia,
+    PortiaToolRegistry,
+    default_config,
+)
+
+load_dotenv()
+
+# Instantiate a Portia instance. Load it with the default config and with Portia cloud tools above
+portia = Portia(tools=PortiaToolRegistry(default_config()))
+
+# Generate the plan from the user query and print it
+plan = portia.plan('Find the github repository of PortiaAI and give it a star for me')
+print(f"{plan.model_dump_json(indent=2)}")
+
+# Run the plan
+plan_run = portia.run_plan(plan)
+
+while plan_run.state == PlanRunState.NEED_CLARIFICATION:
+# If clarifications are needed, resolve them before resuming the plan run
+    for clarification in plan_run.get_outstanding_clarifications():
+# Usual handling of Input and Multiple Choice clarifications
+        if isinstance(clarification, (InputClarification, MultipleChoiceClarification)):
+            print(f"{clarification.user_guidance}")
+            user_input = input("Please enter a value:\n" +
+                               (("\n".join(clarification.options)+"\n") if "options" in clarification else ""))
+            plan_run = portia.resolve_clarification(clarification, user_input, plan_run)
+
+# Handling of Action clarifications
+        if isinstance(clarification, ActionClarification):
+            print(f"{clarification.user_guidance} -- Please click on the link below to proceed.")
+            print(clarification.action_url)
+            plan_run = portia.wait_for_ready(plan_run)
+
+# Once clarifications are resolved, resume the plan run
+    plan_run = portia.resume(plan_run)
+
+```
+
+----------------------------------------
+
+TITLE: Run Python Script with uv - Portia SDK
+DESCRIPTION: Demonstrates how to run a Python script using the 'uv' command. This process includes obtaining the correct Python version, creating a virtual environment, installing dependencies, and executing the script.
+
+SOURCE: https://docs.portialabs.ai/getting-started-tour
+
+LANGUAGE: bash
+CODE:
+```
+uv run <script_name>.py
+```
+
+----------------------------------------
+
+TITLE: Plan Run State JSON Example
+DESCRIPTION: An example JSON output representing the state of a completed Portia plan run. It includes details like plan ID, status, step outputs, and the final personalized output.
+
+SOURCE: https://docs.portialabs.ai/manage-end-users
+
+LANGUAGE: json
+CODE:
+```
+{
+"id":"prun-d9991518-92d7-447f-bf28-4f7b9b8110ce",
+"plan_id":"plan-4f497c60-c33e-40ea-95b4-cd2054559fff",
+"current_step_index":1,
+"clarifications":[],
+"state":"COMPLETE",
+"end_user_id":"DemoUser123",
+"step_outputs":{
+"$svalbard_temperature":{
+"value":"The current weather in Svalbard is light snow with a temperature of -11.53°C."
+},
+"$personalized_greeting":{
+"value":"Hello Nicholas of Patara, I hope you are keeping warm. With the current weather in Svalbard showing light snow and a temperature of -11.53°C, make sure to bundle up and stay cozy!"
+}
+},
+"final_output":{
+"value":"Hello Nicholas of Patara, I hope you are keeping warm. With the current weather in Svalbard showing light snow and a temperature of -11.53°C, make sure to bundle up and stay cozy!"
+}
+}
+```
+
+----------------------------------------
+
+TITLE: Integrate GCP Cloud Run MCP with Portia
+DESCRIPTION: Provides a complete example of equipping a Portia instance with tools from the GCP Cloud Run MCP server, alongside default tools. It shows the setup of configuration, merging registries, and initializing the Portia instance.
+
+SOURCE: https://docs.portialabs.ai/portia-tools/local-mcp/gcp-cloud-run
+
+LANGUAGE: python
+CODE:
+```
+from portia import DefaultToolRegistry, McpToolRegistry, Portia, Config
+
+config = Config.from_default()
+tool_registry = DefaultToolRegistry(config) + McpToolRegistry.from_stdio_connection(
+    server_name="cloud-run-mcp",
+    command="npx",
+    args=["-y","https://github.com/GoogleCloudPlatform/cloud-run-mcp"],
+)
+
+portia = Portia(config=config, tools=tool_registry)
+```
+
+----------------------------------------
+
+TITLE: Equip Portia with Qdrant and Default Tools
+DESCRIPTION: Provides a complete example of equipping a Portia instance with both the default tools and the Qdrant MCP server tools. It shows how to configure Portia and combine tool registries.
+
+SOURCE: https://docs.portialabs.ai/portia-tools/local-mcp/qdrant
+
+LANGUAGE: python
+CODE:
+```
+from portia import DefaultToolRegistry, McpToolRegistry, Portia, Config
+
+config = Config.from_default()
+tool_registry = DefaultToolRegistry(config)+ McpToolRegistry.from_stdio_connection(
+    server_name="qdrant",
+    command="uvx",
+    args=[
+"mcp-server-qdrant",
+],
+    env={
+"QDRANT_LOCAL_PATH":"<path_to_qdrant>",
+"COLLECTION_NAME":"<collection_name>",
+"EMBEDDING_MODEL":"<model_name>",
+},
+)
+
+
+portia = Portia(config=config, tools=tool_registry)
+```
+
+----------------------------------------
+
+TITLE: Plan Run JSON Example
+DESCRIPTION: An example of a plan run result in JSON format, showing the plan ID, current step index, state, and collected outputs.
+
+SOURCE: https://docs.portialabs.ai/run-plan
+
+LANGUAGE: json
+CODE:
+```
+{
+"id":"prun-18d9aa91-0066-413f-af32-b979bce89821",
+"plan_id":"plan-a89efeb0-51ef-4f2c-b435-a936c27c3cfc",
+"current_step_index":2,
+"state":"COMPLETE",
+"outputs":{
+"clarifications":[],
+"step_outputs":{
+"$amazon_stock_growth":{
+"value":"Amazon stock closed at an all-time high of $214.10 in November...",
+"summary":null
+},
+"$google_stock_growth":{
+"value":"In 2024, Google's parent company Alphabet surged 35.5% according to...",
+"summary":null
+},
+"$faster_growth":{
+"value":"In 2024, Amazon's stock price grew by 52%, while Google's parent company Alphabet saw a stock price surge of 35.5%.",
+"summary":null
+}
+},
+"final_output":{
+"value":"In 2024, Amazon's stock price grew by 52%, while Google's parent company Alphabet saw a stock price surge of 35.5%.",
+"summary":null
+}
+}
+}
+```
+
+----------------------------------------
+
+TITLE: Configure Anthropic API Key
+DESCRIPTION: Sets the environment variable for the Anthropic API key. 'sonnet-3.7' and 'sonnet-3.5' are used by default.
+
+SOURCE: https://docs.portialabs.ai/install
+
+LANGUAGE: bash
+CODE:
+```
+export ANTHROPIC_API_KEY='your-api-key-here'
+```
+
+----------------------------------------
+
+TITLE: Instantiating Portia Runner
+DESCRIPTION: Demonstrates how to instantiate a Portia runner, loading default configuration from the environment and including Portia cloud tools along with CLI execution hooks for user interaction during execution.
+
+SOURCE: https://docs.portialabs.ai/getting-started-tour
+
+LANGUAGE: python
+CODE:
+```
+# Instantiate a Portia runner.
+# Load it with the default config from the environment, and with Portia cloud tools.
+```
+
+----------------------------------------
+
+TITLE: Combine Tool Registries and Run Portia
+DESCRIPTION: Shows how to combine multiple tool registries (local and Portia's example registries) using the '+' operator. It then instantiates the Portia class with the combined registry and executes a plan to fetch weather data and write it to a file, demonstrating the integration of custom and example tools.
+
+SOURCE: https://docs.portialabs.ai/add-custom-tools
+
+LANGUAGE: python
+CODE:
+```
+from dotenv import load_dotenv
+from portia import(
+    Portia,
+    example_tool_registry,
+    Config,
+    LogLevel,
+)
+
+load_dotenv()
+
+# Load example and custom tool registries into a single one
+complete_tool_registry = example_tool_registry + my_tool_registry
+# Instantiate Portia with the tools above
+portia = Portia(
+    Config.from_default(default_log_level=LogLevel.DEBUG),
+    tools=complete_tool_registry,
+)
+
+# Execute the plan from the user query
+plan_run = portia.run('Get the weather in the town with the longest name in Welsh'
++' and write it to demo_runs/weather.txt.')
+
+# Serialise into JSON and print the output
+print(plan_run.model_dump_json(indent=2))
+
+```
+
+----------------------------------------
+
+TITLE: Value Confirmation Clarification Example
+DESCRIPTION: An example of a Value Confirmation clarification, used to get user confirmation or denial for a particular value, useful for 'human in the loop' tasks. The `argument` attribute indicates the value being confirmed.
+
+SOURCE: https://docs.portialabs.ai/understand-clarifications
+
+LANGUAGE: json
+CODE:
+```
+{
+  "uuid":"clar-425c8ce9-8fc9-43af-b99e-64903043c5df",
+  "plan_run_id":"prun-89c6bd4f-29d2-4aad-bf59-8ba3229fd258",
+  "category": “Value Confirmation”,
+  "step":2,
+  "user_guidance":"This will email all contacts in your database. Are you sure you want to proceed?",
+  "resolved":true,
+  "argument":"$email_all_contacts"
+}
+```
+
+----------------------------------------
+
+TITLE: Portia Plan Execution Example
+DESCRIPTION: Illustrates a typical plan execution flow in Portia, including searching for a GitHub repository and starring it. It shows the expected JSON structure for a plan and its corresponding run.
+
+SOURCE: https://docs.portialabs.ai/run-portia-tools
+
+LANGUAGE: json
+CODE:
+```
+{
+"id":"plan-71fbe578-0c3f-4266-b5d7-933e8bb10ef2",
+"plan_context":{
+"query":"Find the github repository of PortiaAI and give it a star for me",
+"tool_ids":[
+"portia::github::search_repos",
+"portia::github::star_repo",
+"portia::slack::send_message",
+"portia::zendesk::list_groups_for_user",
+        ...
+]
+},
+"steps":[
+{
+"task":"Search for the GitHub repository of PortiaAI",
+"inputs":[],
+"tool_id":"portia:github::search_repos",
+"output":"$portiaai_repository"
+},
+{
+"task":"Star the GitHub repository of PortiaAI",
+"inputs":[
+{
+"name":"$portiaai_repository",
+"description":"The GitHub repository of PortiaAI"
+}
+],
+"tool_id":"portia:github::star_repo",
+"output":"$star_result"
+}
+]
+}
+```
+
+LANGUAGE: json
+CODE:
+```
+{
+"id":"prun-36945fae-1dcc-4b05-9bc4-4b862748e031",
+"plan_id":"plan-71fbe578-0c3f-4266-b5d7-933e8bb10ef2",
+"current_step_index":1,
+"state":"COMPLETE",
+"outputs":{
+"clarifications":[
+{
+"uuid":"clar-f873b9be-10ee-4184-a717-3a7559416499",
+"category": “Multiple Choice”,
+"response": “portiaAI/portia-sdk-python",
+"step":2,
+"user_guidance":"Please select a repository.",
+"handled":true,
+"argument":"$portiaai_repository",
+"options":"[\"portiaAI/portia-sdk-python\", \"portiaAI/docs\", \"portiaAI/portia-agent-examples\"]",
+}
+],
+"step_outputs":{
+"$portiaai_repository":{
+"value":"[\"portiaAI/portia-sdk-python\", \"portiaAI/docs\", \"portiaAI/portia-agent-examples\"]",
+"summary":null
+},
+"$star_result":{
+"value":"Successfully starred the repository 'portiaAI/portia-sdk-python'.",
+"summary":null
+}
+},
+"final_output":{
+"value":"Successfully starred the repository 'portiaAI/portia-sdk-python'.",
+"summary":null
+}
+}
+}
+```
+
+----------------------------------------
+
+TITLE: Python Single Tool Agent Step Example
+DESCRIPTION: Illustrates the use of `.single_tool_agent_step()` to call a tool with dynamically resolved arguments. This example shows how to specify the tool, the task, and the inputs required for the tool.
+
+SOURCE: https://docs.portialabs.ai/build-plan
+
+LANGUAGE: python
+CODE:
+```
+builder.single_tool_agent_step(
+    tool="web_scraper",
+    task="Extract key information from the webpage provided",
+    inputs=[StepOutput("text_blob_with_url")],
+    name="scrape_webpage"
+)
+```
+
+----------------------------------------
+
+TITLE: Instantiate Portia and Run Plan from User Query
+DESCRIPTION: This snippet demonstrates how to instantiate the Portia agent with example tools and then directly execute a plan based on a user's query. It shows the process of generating and running a plan in a single step using the `run` method.
+
+SOURCE: https://docs.portialabs.ai/run-plan
+
+LANGUAGE: python
+CODE:
+```
+from dotenv import load_dotenv
+from portia import(
+    Portia,
+    example_tool_registry,
+)
+
+load_dotenv()
+
+# Instantiate a Portia instance. Load it with the default config and the example tools.
+portia = Portia(tools=example_tool_registry)
+
+# Generate the plan from the user query and run it
+plan_run = portia.run('Which stock price grew faster in 2024, Amazon or Google?')
+
+# Serialise into JSON and print the output
+print(plan_run.model_dump_json(indent=2))
+```
+
+----------------------------------------
+
+TITLE: Defining Portia Tasks
+DESCRIPTION: Defines two example tasks for Portia: a simple task to star a GitHub repository and a more complex task involving calendar checks and meeting scheduling.
+
+SOURCE: https://docs.portialabs.ai/getting-started-tour
+
+LANGUAGE: python
+CODE:
+```
+# A relatively simple task: 
+task0 ="Star the github repo for portiaAI/portia-sdk-python"
+
+# A more complex task: 
+task1 ="""
+Check my availability in Google Calendar for tomorrow between 10am and 12pm.
+If I have any free times between 10am and 12pm, please schedule a 30-minute meeting with
+bob (bob@portialabs.ai) with title 'Encode Hackathon', and description 'hack it'.
+If I don't have any free times, please output the next time after 12pm when I am free.
+"""
+```
+
+----------------------------------------
+
+TITLE: Install Local Browser Dependencies for Portia SDK
+DESCRIPTION: Installs the necessary dependency group for using local Chrome instances with the Portia SDK. The 'all' dependency group is also an option for comprehensive installation.
+
+SOURCE: https://docs.portialabs.ai/browser-tools
+
+LANGUAGE: bash
+CODE:
+```
+pip install "portia-sdk-python[tools-browser-local]"
+# Alternatively, install our 'all' dependency group to get everything
+pip install "portia-sdk-python[all]"
+```
+
+----------------------------------------
+
+TITLE: Install Browserbase Dependencies for Portia SDK
+DESCRIPTION: Installs the necessary dependency group for using Browserbase infrastructure with the Portia SDK. Alternatively, the 'all' dependency group can be installed to include all Portia features.
+
+SOURCE: https://docs.portialabs.ai/browser-tools
+
+LANGUAGE: bash
+CODE:
+```
+pip install "portia-sdk-python[tools-browser-browserbase]"
+# Alternatively, install our 'all' dependency group to get everything
+pip install "portia-sdk-python[all]"
+```
+
+----------------------------------------
+
+TITLE: Custom Emoji Evaluator and Tool Stubbing with Portia
+DESCRIPTION: This Python code defines a custom evaluator to count emojis in the output of a plan run and stubs the 'file_reader_tool' to return static content. It then configures a Portia client with the stubbed tool and runs evals using the custom evaluator.
+
+SOURCE: https://docs.portialabs.ai/steel-thread-quickstart
+
+LANGUAGE: python
+CODE:
+```
+from portia import Portia, Config, DefaultToolRegistry
+from steelthread.steelthread import SteelThread, EvalConfig
+from steelthread.evals import Evaluator, EvalMetric
+from steelthread.portia.tools import ToolStubRegistry, ToolStubContext
+
+
+# Define custom evaluator
+class EmojiEvaluator(Evaluator):
+    def eval_test_case(self, test_case, plan, plan_run, metadata):
+        out = plan_run.outputs.final_output.get_value() or ""
+        count = out.count("⚠️")
+        return EvalMetric.from_test_case(
+            test_case=test_case,
+            name="emoji_score",
+            score=min(count / 2, 1.0),
+            description="Emoji usage",
+            explanation=f"Found {count} ⚠️ emojis in the output.",
+            actual_value=str(count),
+            expectation="2"
+        )
+
+# Define stub behavior
+def file_reader_stub_response(ctx: ToolStubContext) -> str:
+    """Stub response for file reader tool to return static file content."""
+    filename = ctx.kwargs.get("filename", "").lower()
+
+    return f"Feedback from file:{filename} suggests \
+        ⚠️ 'One does not simply Calorify' \
+        and ⚠️ 'Calorify is not a diet' \
+        and ⚠️ 'Calorify is not a weight loss program' \
+        and ⚠️ 'Calorify is not a fitness program' \
+        and ⚠️ 'Calorify is not a health program' \
+        and ⚠️ 'Calorify is not a nutrition program' \
+        and ⚠️ 'Calorify is not a meal delivery service' \
+        and ⚠️ 'Calorify is not a meal kit service' "
+
+
+config = Config.from_default()
+
+# Add the tool stub definition to your Portia client using a ToolStubRegistry
+portia = Portia(
+    config,
+    tools=ToolStubRegistry(
+        DefaultToolRegistry(config),
+        stubs={
+            "file_reader_tool": file_reader_stub_response,
+        },
+    ),
+)
+
+# Run evals with stubs 
+SteelThread().run_evals(
+    portia,
+    EvalConfig(
+        eval_dataset_name="your-dataset-name-here",  # TODO: replace with your dataset name
+        config=config,
+        iterations=5,
+        evaluators=[EmojiEvaluator(config)]
+    ),
+)
+
+```
+
+----------------------------------------
+
+TITLE: Portia Integration with Browserbase
+DESCRIPTION: Provides a complete example of equipping a Portia instance with Browserbase tools alongside default tools. It shows how to create a Config, initialize DefaultToolRegistry and McpToolRegistry, and then instantiate the Portia client.
+
+SOURCE: https://docs.portialabs.ai/portia-tools/local-mcp/browserbase
+
+LANGUAGE: python
+CODE:
+```
+from portia import DefaultToolRegistry, McpToolRegistry, Portia, Config
+
+config = Config.from_default()
+tool_registry = DefaultToolRegistry(config) + McpToolRegistry.from_stdio_connection(
+    server_name="browserbase",
+    command="npx",
+    args=["@browserbasehq/mcp"],
+    env={"BROWSERBASE_API_KEY":"<api_key>","BROWSERBASE_PROJECT_ID":"<project_id>"},
+)
+
+portia = Portia(config=config, tools=tool_registry)
+```
+
+----------------------------------------
+
+TITLE: Configure Slack App for Portia AI
+DESCRIPTION: Provides a comprehensive guide on setting up a Slack application for use with Portia AI. This includes creating a Slack app, noting down client ID and secret, configuring the Redirect URL, setting necessary Bot and User Token Scopes, and installing the app to a Slack workplace.
+
+SOURCE: https://docs.portialabs.ai/portia-tools/portia-cloud/slack/get-conversation
+
+LANGUAGE: APIDOC
+CODE:
+```
+Configure Slack tools with Portia AI:
+
+1. Create a Slack App:
+   - Head over to [**api.slack.com/apps ↗**](https://api.slack.com/apps).
+   - Create an app from scratch and select the Slack workplace.
+   - Note down the client ID and secret from the **Basic Information** page.
+
+2. Configure OAuth & Permissions:
+   - In the **OAuth & Permissions** tab, add the Redirect URL: `https://api.portialabs.ai/api/v0/oauth/slack`.
+   - Save URLs.
+   - Under **Bot Token Scopes**, add:
+     - `channels:history`: View messages in public channels.
+     - `channels:read`: View basic information about public channels.
+     - `chat:write`: Send messages as the Slack app.
+     - `users:read`: View people in a workspace.
+   - Under **User Token Scopes**, add:
+     - `search:read`: Support searching workplace content.
+
+3. Install Slack App:
+   - Scroll up to the **OAuth & Permissions** page.
+   - Hit the **Install to _{your workplace name}_** button.
+   - Open your Slack app and select 'Add apps', then choose your new app.
+```
+
+----------------------------------------
+
+TITLE: Install and Quickstart SteelThread
+DESCRIPTION: SteelThread requires access to agent activity in Portia cloud. You need a PORTIAAPIKEY to begin. Generate a new API key from the 'Manage API keys' tab in app.portialabs.ai.
+
+SOURCE: https://docs.portialabs.ai/evals-steel-thread
+
+LANGUAGE: en
+CODE:
+```
+You will need a PORTIAAPIKEY to get started. Head over to (app.portialabs.ai ↗) and navigate to the Manage API keys tab from the left hand nav. There you can generate a new API key.
+```
+
+----------------------------------------
+
+TITLE: Portia OAuth Authentication Example
+DESCRIPTION: Demonstrates how to handle OAuth authentication for Portia tools that require it, using the `portia.wait_for_ready()` method.
+
+SOURCE: https://docs.portialabs.ai/portia-tools/portia-cloud/google-sheets/sheets-get-spreadsheet
+
+LANGUAGE: python
+CODE:
+```
+# Example of handling OAuth authentication with Portia tools
+# All Portia tools using API endpoints that require OAuth are built with plug and play authentication support.
+# They use Portia client credentials including client ID, client name and redirect URL.
+# Such tools will raise a `Action Clarification` with an OAuth link as the action URL.
+# The `portia.wait_for_ready()` method must be used in this scenario: Portia's OAuth server will listen for the authentication result and resolve the concerned clarification, allowing your plan run to resume again.
+# For more on this, please visit to the section on running Portia tools (https://docs.portialabs.ai/run-portia-tools).
+
+# Assuming 'portia' is an initialized Portia client
+# try:
+#     result = portia.get_spreadsheet(spreadsheet_id='YOUR_SPREADSHEET_ID')
+# except PortiaOAuthError as e:
+#     print(f"OAuth required: {e.oauth_url}")
+#     portia.wait_for_ready()
+#     result = portia.get_spreadsheet(spreadsheet_id='YOUR_SPREADSHEET_ID')
+
+# print(result)
+```
+
+----------------------------------------
+
+TITLE: Example Plan Structure (JSON)
+DESCRIPTION: Demonstrates the structure of a plan in JSON format, outlining steps, tasks, inputs, tool IDs, outputs, and conditions for executing a sequence of operations.
+
+SOURCE: https://docs.portialabs.ai/generate-plan
+
+LANGUAGE: json
+CODE:
+```
+{
+  "steps": [
+    {
+      "task": "Search for the latest SpaceX news from the past 48 hours using the search tool.",
+      "inputs": [],
+      "tool_id": "search_tool",
+      "output": "$spacex_news_results"
+    },
+    {
+      "task": "Summarize the top 3 developments from the SpaceX news articles.",
+      "inputs": [
+        {
+          "name": "$spacex_news_results",
+          "description": "The list of SpaceX news articles returned by the search tool."
+        }
+      ],
+      "tool_id": "llm_tool",
+      "output": "$spacex_summary",
+      "condition": "if $spacex_news_results contains at least 3 articles"
+    },
+    {
+      "task": "Email Avrana (avrana@kern.ai) a summary of the top 3 SpaceX developments with the subject 'Latest SpaceX Updates'.",
+      "inputs": [
+        {
+          "name": "$spacex_summary",
+          "description": "The summary of the top 3 SpaceX developments."
+        }
+      ],
+      "tool_id": "portia:google:gmail:send_email",
+      "output": "$email_sent",
+      "condition": "if $spacex_news_results contains at least 3 articles"
+    }
+  ]
+}
+```
+
+----------------------------------------
+
+TITLE: Portia OAuth Authentication Example
+DESCRIPTION: Illustrates how to handle OAuth authentication for Portia tools that require it, using the `portia.wait_for_ready()` method to manage the authentication flow and resume plan execution.
+
+SOURCE: https://docs.portialabs.ai/portia-tools/portia-cloud/google-gmail/gmail-send-email
+
+LANGUAGE: Python
+CODE:
+```
+from portia_client import PortiaClient
+
+client = PortiaClient()
+
+# Assuming 'send_email_tool' is a tool that requires OAuth
+tool_input = {
+    "recipients": ["test@example.com"],
+    "email_title": "Test Email",
+    "email_body": "This is a test email."
+}
+
+try:
+    result = client.run_tool("portia:google:gmail:send_email", tool_input)
+    print("Email sent successfully:", result)
+except Exception as e:
+    if "Action Clarification" in str(e):
+        # Handle OAuth flow
+        oauth_url = client.get_oauth_url("portia:google:gmail:send_email")
+        print(f"Please authenticate at: {oauth_url}")
+        # Portia's OAuth server will listen for the result
+        # Use portia.wait_for_ready() to resume execution after authentication
+        client.wait_for_ready()
+        # Retry running the tool after authentication
+        result = client.run_tool("portia:google:gmail:send_email", tool_input)
+        print("Email sent successfully after authentication:", result)
+    else:
+        print(f"An error occurred: {e}")
+
+``

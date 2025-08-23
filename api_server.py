@@ -384,7 +384,7 @@ class BrowserExecutor:
                                     })
                 print(f"✅ Loaded {len(thoughts)} agent thoughts from {thoughts_file}")
             else:
-                print(f"⚠️ Agent thoughts file not found: {thoughts_file}")
+                print(f"[WARNING] Agent thoughts file not found: {thoughts_file}")
         except Exception as e:
             print(f"❌ Error loading agent thoughts: {e}")
         
@@ -417,15 +417,15 @@ class BrowserExecutor:
         
         try:
             # Debug the history object structure
-            print(f"🔍 Debug - History type: {type(history)}")
-            print(f"🔍 Debug - History dir: {dir(history)}")
+            print(f"[DEBUG] History type: {type(history)}")
+            print(f"[DEBUG] History dir: {dir(history)}")
             
             # Handle new AgentHistoryList format that has a .history attribute
             if hasattr(history, 'history'):
-                print(f"🔍 Debug - AgentHistoryList detected, accessing .history attribute")
+                print(f"[DEBUG] AgentHistoryList detected, accessing .history attribute")
                 actual_history = history.history
-                print(f"🔍 Debug - Actual history type: {type(actual_history)}")
-                print(f"🔍 Debug - Actual history length: {len(actual_history)}")
+                print(f"[DEBUG] Actual history type: {type(actual_history)}")
+                print(f"[DEBUG] Actual history length: {len(actual_history)}")
                 
                 # Convert actual history to list if it's not already
                 if hasattr(actual_history, '__iter__'):
@@ -439,7 +439,7 @@ class BrowserExecutor:
                 else:
                     history_list = [history] if history else []
             
-            print(f"🔍 Debug - Final history list length: {len(history_list)}")
+            print(f"[DEBUG] Final history list length: {len(history_list)}")
             
             # Store debug info
             results["debug_info"] = {
@@ -450,8 +450,8 @@ class BrowserExecutor:
             
             if history_list:
                 for i, step in enumerate(history_list):
-                    print(f"🔍 Debug - Step {i+1} type: {type(step)}")
-                    print(f"🔍 Debug - Step {i+1} attributes: {dir(step)}")
+                    print(f"[DEBUG] Step {i+1} type: {type(step)}")
+                    print(f"[DEBUG] Step {i+1} attributes: {dir(step)}")
                     
                     # Extract step information with enhanced processing
                     step_info = {
@@ -484,7 +484,7 @@ class BrowserExecutor:
                     
                     # Handle AgentHistory objects from browser-use
                     if hasattr(step, 'model_output') and hasattr(step, 'result'):
-                        print(f"🔍 Debug - AgentHistory object detected")
+                        print(f"[DEBUG] AgentHistory object detected")
                         model_output = step.model_output
                         result = step.result
                         
@@ -607,7 +607,7 @@ class BrowserExecutor:
                     
                     # Handle tuple format (appears to be the actual format)
                     elif isinstance(step, tuple):
-                        print(f"🔍 Debug - Tuple length: {len(step)}")
+                        print(f"[DEBUG] Tuple length: {len(step)}")
                         if len(step) >= 2:
                             # Typically (model_output, result) or similar
                             action_data = str(step[0]) if step[0] else "N/A"
@@ -632,7 +632,7 @@ class BrowserExecutor:
                             
                         # Look for additional data in the tuple
                         for j, item in enumerate(step):
-                            print(f"🔍 Debug - Tuple item {j}: {type(item)} = {str(item)[:100]}...")
+                            print(f"[DEBUG] Tuple item {j}: {type(item)} = {str(item)[:100]}...")
                             
                             # Check if any item has screenshot data
                             if hasattr(item, 'screenshot') and item.screenshot:
@@ -766,7 +766,7 @@ class BrowserExecutor:
                 results["success"] = True
                 print(f"✅ Processed {len(history_list)} execution steps with {len(results['screenshots'])} screenshots")
             else:
-                print("⚠️ No history items found")
+                print("[WARNING] No history items found")
             
         except Exception as e:
             results["error"] = str(e)
@@ -1622,51 +1622,75 @@ Keep response clear and actionable."""
         
         try:
             # Create Portia config with minimal settings to avoid telemetry issues
-            google_config = Config.from_default(
-                llm_provider=LLMProvider.GOOGLE,
-                default_model="google/gemini-2.0-flash",
-                google_api_key=GEMINI_API_KEY
-            )
+            # Try multiple approaches to disable telemetry
+            import os
+            original_telemetry = os.environ.get('PORTIA_TELEMETRY_ENABLED')
+            os.environ['PORTIA_TELEMETRY_ENABLED'] = 'false'
             
-            # Disable telemetry if possible
             try:
-                # Try to disable Portia telemetry to avoid the posthog errors
-                google_config.telemetry_enabled = False
-            except:
-                pass
+                google_config = Config.from_default(
+                    llm_provider=LLMProvider.GOOGLE,
+                    default_model="google/gemini-2.0-flash",
+                    google_api_key=GEMINI_API_KEY
+                )
+                
+                # Try to disable telemetry through multiple methods
+                for attr in ['telemetry_enabled', 'enable_telemetry', 'telemetry']:
+                    try:
+                        setattr(google_config, attr, False)
+                    except:
+                        pass
+                
+                # Create Portia agent for analysis
+                portia_agent = Portia(config=google_config)
+            finally:
+                # Restore original telemetry setting
+                if original_telemetry is not None:
+                    os.environ['PORTIA_TELEMETRY_ENABLED'] = original_telemetry
+                else:
+                    os.environ.pop('PORTIA_TELEMETRY_ENABLED', None)
             
-            # Create Portia agent for analysis
-            portia_agent = Portia(config=google_config)
+            # Run analysis with error handling and telemetry error suppression
+            import warnings
+            import logging
             
-            # Run analysis with error handling
-            plan_run = portia_agent.run(prompt)
+            # Temporarily suppress telemetry-related warnings/errors
+            telemetry_logger = logging.getLogger('portia.telemetry.telemetry_service')
+            original_level = telemetry_logger.level
+            telemetry_logger.setLevel(logging.CRITICAL)
+            
+            try:
+                plan_run = portia_agent.run(prompt)
+            finally:
+                # Restore original logging level
+                telemetry_logger.setLevel(original_level)
             
             # Extract analysis from plan run with enhanced error handling
             ai_analysis = None
             extraction_method = "unknown"
             
             # First, let's check what Portia actually returned by examining all attributes
-            print(f"\ud83d\udd0d Debug - Portia plan_run type: {type(plan_run)}")
-            print(f"\ud83d\udd0d Debug - Portia plan_run attributes: {[attr for attr in dir(plan_run) if not attr.startswith('_')]}")
+            print(f"[DEBUG] Portia plan_run type: {type(plan_run)}")
+            print(f"[DEBUG] Portia plan_run attributes: {[attr for attr in dir(plan_run) if not attr.startswith('_')]}")
             
             # Method 1: Try outputs (most likely location for step results)
             if hasattr(plan_run, 'outputs') and plan_run.outputs:
-                print(f"\ud83d\udd0d Debug - Found outputs: {type(plan_run.outputs)}")
+                print(f"[DEBUG] Found outputs: {type(plan_run.outputs)}")
                 
                 # Check if outputs has final_output
                 if hasattr(plan_run.outputs, 'final_output') and plan_run.outputs.final_output:
                     final_output = plan_run.outputs.final_output
-                    print(f"\ud83d\udd0d Debug - final_output type: {type(final_output)}")
+                    print(f"[DEBUG] final_output type: {type(final_output)}")
                     
                     # Check if it's a LocalDataValue object with value attribute
                     if hasattr(final_output, 'value') and final_output.value:
                         content = str(final_output.value).strip()
-                        print(f"\ud83d\udd0d Debug - Found final_output.value: {len(content)} chars")
-                        print(f"\ud83d\udd0d Debug - Content preview: {content[:200]}...")
+                        print(f"[DEBUG] Found final_output.value: {len(content)} chars")
+                        print(f"[DEBUG] Content preview: {content[:200]}...")
                         if len(content) > 20:
                             ai_analysis = content
                             extraction_method = "outputs_final_output_value"
-                            print(f"\u2705 Successfully extracted from outputs.final_output.value: {len(content)} characters")
+                            print(f"[SUCCESS] Successfully extracted from outputs.final_output.value: {len(content)} characters")
                     
                     # Fallback: try string conversion of final_output
                     if not ai_analysis:
@@ -1674,33 +1698,33 @@ Keep response clear and actionable."""
                         if len(content) > 20 and not content.startswith('LocalDataValue'):
                             ai_analysis = content
                             extraction_method = "outputs_final_output_string"
-                            print(f"\u2705 Successfully extracted from outputs.final_output string: {len(content)} characters")
+                            print(f"[SUCCESS] Successfully extracted from outputs.final_output string: {len(content)} characters")
                 
                 # Check if outputs has step_outputs
                 if not ai_analysis and hasattr(plan_run.outputs, 'step_outputs') and plan_run.outputs.step_outputs:
                     step_outputs = plan_run.outputs.step_outputs
-                    print(f"\ud83d\udd0d Debug - Found step_outputs: {type(step_outputs)}")
+                    print(f"[DEBUG] Found step_outputs: {type(step_outputs)}")
                     
                     if isinstance(step_outputs, dict):
                         # Look for analysis or other relevant keys
                         for key in ['$analysis', 'analysis', 'result', 'output']:
                             if key in step_outputs:
                                 step_output = step_outputs[key]
-                                print(f"\ud83d\udd0d Debug - Found step_outputs[{key}]: {type(step_output)}")
+                                print(f"[DEBUG] Found step_outputs[{key}]: {type(step_output)}")
                                 
                                 # Check if it's a LocalDataValue object
                                 if hasattr(step_output, 'value') and step_output.value:
                                     content = str(step_output.value).strip()
-                                    print(f"\ud83d\udd0d Debug - Found step_outputs[{key}].value: {len(content)} chars")
+                                    print(f"[DEBUG] Found step_outputs[{key}].value: {len(content)} chars")
                                     if len(content) > 20:
                                         ai_analysis = content
                                         extraction_method = f"outputs_step_outputs_{key}_value"
-                                        print(f"\u2705 Successfully extracted from outputs.step_outputs[{key}].value: {len(content)} characters")
+                                        print(f"[SUCCESS] Successfully extracted from outputs.step_outputs[{key}].value: {len(content)} characters")
                                         break
                                 elif isinstance(step_output, str) and len(step_output.strip()) > 20:
                                     ai_analysis = step_output.strip()
                                     extraction_method = f"outputs_step_outputs_{key}"
-                                    print(f"\u2705 Successfully extracted from outputs.step_outputs[{key}]: {len(ai_analysis)} characters")
+                                    print(f"[SUCCESS] Successfully extracted from outputs.step_outputs[{key}]: {len(ai_analysis)} characters")
                                     break
                 
                 # Last resort for outputs: try string conversion
@@ -1734,12 +1758,12 @@ Keep response clear and actionable."""
                             if len(extracted) > 50:
                                 ai_analysis = extracted
                                 extraction_method = "outputs_string_parsed"
-                                print(f"\u2705 Successfully parsed analysis from outputs string: {len(extracted)} characters")
+                                print(f"[SUCCESS] Successfully parsed analysis from outputs string: {len(extracted)} characters")
             
             # Method 2: Try final_output with relaxed validation
             if not ai_analysis and hasattr(plan_run, 'final_output') and plan_run.final_output:
                 content = str(plan_run.final_output).strip()
-                print(f"\ud83d\udd0d Debug - final_output content: {content[:200]}...")
+                print(f"[DEBUG] final_output content: {content[:200]}...")
                 # Much more relaxed validation - just check it's not empty and not a clear object repr
                 if (len(content) > 5 and 
                     not content.startswith('Run(id=') and 
@@ -1749,12 +1773,12 @@ Keep response clear and actionable."""
                     'object at 0x' not in content):
                     ai_analysis = content
                     extraction_method = "final_output"
-                    print(f"\u2705 Successfully extracted from final_output: {len(content)} characters")
+                    print(f"[SUCCESS] Successfully extracted from final_output: {len(content)} characters")
             
             # Method 3: Try output attribute
             if not ai_analysis and hasattr(plan_run, 'output') and plan_run.output:
                 content = str(plan_run.output).strip()
-                print(f"\ud83d\udd0d Debug - output content: {content[:200]}...")
+                print(f"[DEBUG] output content: {content[:200]}...")
                 if (len(content) > 5 and 
                     not content.startswith('Run(id=') and 
                     not content.startswith('PlanRun(id=') and
@@ -1762,14 +1786,14 @@ Keep response clear and actionable."""
                     'object at 0x' not in content):
                     ai_analysis = content
                     extraction_method = "output"
-                    print(f"\u2705 Successfully extracted from output: {len(content)} characters")
+                    print(f"[SUCCESS] Successfully extracted from output: {len(content)} characters")
             
             # Method 4: Try steps extraction
             if not ai_analysis and hasattr(plan_run, 'steps') and plan_run.steps:
-                print(f"\ud83d\udd0d Debug - Found {len(plan_run.steps)} steps")
+                print(f"[DEBUG] Found {len(plan_run.steps)} steps")
                 for i, step in enumerate(plan_run.steps):
                     step_attrs = [attr for attr in dir(step) if not attr.startswith('_')]
-                    print(f"\ud83d\udd0d Debug - Step {i} attributes: {step_attrs}")
+                    print(f"[DEBUG] Step {i} attributes: {step_attrs}")
                     
                     # Check multiple possible attributes
                     for attr in ['output', 'result', 'content', 'response', 'text']:
@@ -1782,7 +1806,7 @@ Keep response clear and actionable."""
                                     not content.startswith('PlanRun(id=')):
                                     ai_analysis = content
                                     extraction_method = f"step_{i}_{attr}"
-                                    print(f"\u2705 Successfully extracted from step {i}.{attr}: {len(content)} characters")
+                                    print(f"[SUCCESS] Successfully extracted from step {i}.{attr}: {len(content)} characters")
                                     break
                     if ai_analysis:
                         break
@@ -1794,49 +1818,49 @@ Keep response clear and actionable."""
                         attr_value = getattr(plan_run, attr)
                         if attr_value:
                             content = str(attr_value).strip()
-                            print(f"\ud83d\udd0d Debug - {attr} content: {content[:100]}...")
+                            print(f"[DEBUG] {attr} content: {content[:100]}...")
                             if (len(content) > 5 and 
                                 not content.startswith('Run(id=') and 
                                 not content.startswith('PlanRun(id=') and
                                 'object at 0x' not in content):
                                 ai_analysis = content
                                 extraction_method = f"attribute_{attr}"
-                                print(f"\u2705 Successfully extracted from {attr}: {len(content)} characters")
+                                print(f"[SUCCESS] Successfully extracted from {attr}: {len(content)} characters")
                                 break
             
             # Validate final result
             if ai_analysis and len(ai_analysis.strip()) >= 5:
-                print(f"\ud83c\udf89 Final analysis extracted successfully!")
-                print(f"\u2705 Extraction method: {extraction_method}")
-                print(f"\u2705 Content length: {len(ai_analysis)} characters")
-                print(f"\u2705 Content preview: {ai_analysis[:300]}...")
+                print(f"[SUCCESS] Final analysis extracted successfully!")
+                print(f"[SUCCESS] Extraction method: {extraction_method}")
+                print(f"[SUCCESS] Content length: {len(ai_analysis)} characters")
+                print(f"[SUCCESS] Content preview: {ai_analysis[:300]}...")
             else:
                 raise Exception(f"Portia returned insufficient analysis content. Method: {extraction_method}")
                 
         except Exception as portia_error:
-            print(f"⚠️ Portia analysis failed, using fallback: {portia_error}")
-            print(f"🔍 Error type: {type(portia_error).__name__}")
+            print(f"[WARNING] Portia analysis failed, using fallback: {portia_error}")
+            print(f"[DEBUG] Error type: {type(portia_error).__name__}")
             
             # Enhanced fallback analysis with better context
-            ai_analysis = f"""🤖 **AI Analysis Report**
+            ai_analysis = f"""**AI Analysis Report**
 
 **Executive Summary:**
 The browser automation task {'completed successfully' if task_success else 'encountered issues'} with {steps_count} execution steps and {screenshots_count} screenshots captured. {'The target URL was accessed properly' if url_accessed else 'There may have been issues accessing the target URL'}.
 
 **Key Findings:**
-• Task Status: {'✅ Success' if task_success else '❌ Failed'}
+• Task Status: {'Success' if task_success else 'Failed'}
 • Execution Steps: {steps_count} completed
 • Visual Documentation: {screenshots_count} screenshots captured
-• Target URL Access: {'✅ Successful' if url_accessed else '❌ Failed or incomplete'}
+• Target URL Access: {'Successful' if url_accessed else 'Failed or incomplete'}
 • Error Status: {'No errors detected' if task_success else 'Errors occurred during execution'}
 
 **Recommendations:**
 {chr(10).join(f'• {rec}' for rec in recommendations) if recommendations else '• Review execution logs for detailed information' + chr(10) + '• Check screenshots for visual confirmation' + chr(10) + '• Verify task completion manually if needed'}
 
 **Compliance Status:**
-• Overall Assessment: {'✅ PASS' if task_success and url_accessed else '⚠️ NEEDS REVIEW'}
-• Target URL Compliance: {'✅ PASS' if url_accessed else '❌ FAIL'}
-• Task Execution: {'✅ PASS' if task_success else '❌ FAIL'}
+• Overall Assessment: {'PASS' if task_success and url_accessed else 'NEEDS REVIEW'}
+• Target URL Compliance: {'PASS' if url_accessed else 'FAIL'}
+• Task Execution: {'PASS' if task_success else 'FAIL'}
 
 ---
 *Note: This analysis was generated using fallback mode due to AI analysis system limitations. The task execution results above are still accurate.*"""
