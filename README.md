@@ -1,9 +1,13 @@
 # WebSentinel - AI-Powered Web Testing Platform
 
 [![Demo Video](images/demo.png)](https://youtu.be/sE3TGDDeI4Q)
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg?style=for-the-badge)](https://python.org)
-[![React](https://img.shields.io/badge/React-18+-blue.svg?style=for-the-badge)](https://reactjs.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg?style=for-the-badge)](https://fastapi.tiangolo.com)
+
+<div align="center">
+  <img src="https://img.shields.io/badge/POWERED%20BY-PORTIA%20AI-blue?style=for-the-badge&logo=robot&logoColor=white" alt="Powered by Portia AI"/>
+  <img src="https://img.shields.io/badge/BACKEND-FASTAPI-teal?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI Backend"/>
+  <img src="https://img.shields.io/badge/FRONTEND-REACT-blue?style=for-the-badge&logo=react&logoColor=white" alt="React Frontend"/>
+  <img src="https://img.shields.io/badge/PYTHON-3.8+-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.8+"/>
+</div>
 
 > **🏆 Built for AgentHack 2025** - A powerful web-based platform for automated website testing that leverages Portia AI's agent framework to combine browser automation with intelligent AI analysis, featuring real-time execution monitoring and comprehensive results visualization.
 
