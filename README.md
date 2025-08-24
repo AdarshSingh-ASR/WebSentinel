@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/PYTHON-3.8+-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.8+"/>
 </div>
 
-> **🏆 Built for AgentHack 2025** - A powerful web-based platform for automated website testing that leverages Portia AI's agent framework to combine browser automation with intelligent AI analysis, featuring real-time execution monitoring and comprehensive results visualization.
+> **🏆 Built for AgentHack 2025** - A powerful web-based platform for automated website testing that leverages Portia AI's agent framework to combine browser automation with intelligent AI analysis, featuring real-time execution monitoring and comprehensive results visualization. Can be used to scrape things as well.
 
 ## 📋 Table of Contents
 
@@ -26,8 +26,7 @@
 
 ## 🎯 Overview
 
-WebSentinel is a comprehensive web testing platform that leverages Portia AI's agent framework to automate website testing and analysis. It combines the power of browser automation with intelligent, controllable AI agents to provide detailed insights into web application behavior.
-
+WebSentinel is a comprehensive web testing platform that leverages Portia AI's agent framework to automate website testing and analysis. It combines the power of browser automation with intelligent, controllable AI agents to provide detailed insights into web application behavior. WebSentinel can be used to scrape things as well.
 ## 🤖 Why Portia AI?
 
 Portia AI enables us to create sophisticated, controllable AI agents that handle complex web testing workflows. Our system uses Portia's framework to orchestrate:
@@ -747,6 +746,6 @@ WebSentinel combines the power of modern web development with Portia AI's intell
 
 **🏆 Enjoy automated website testing with AI-powered insights!**
 
-WebSentinel combines the power of modern web development with Portia AI's intelligent, controllable agent framework to create a comprehensive, user-friendly testing solution.
+WebSentinel combines the power of modern web development with Portia AI's intelligent, controllable agent framework to create a comprehensive, user-friendly testing solution. It can also be used to scrap things as well.
 
 **Built for AgentHack 2025** - Demonstrating the future of AI-powered web automation and testing through Portia's agent capabilities.
