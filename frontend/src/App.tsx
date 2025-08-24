@@ -91,10 +91,7 @@ function App() {
   const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   
-  // Debug logging for analysis result changes
-  useEffect(() => {
-    console.log('Analysis result state changed:', analysisResult);
-  }, [analysisResult]);
+
   const [isExecuting, setIsExecuting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [pollingInterval, setPollingInterval] = useState<number | null>(null);
@@ -275,11 +272,6 @@ function App() {
         if (validAnalysis) {
           console.log('Setting valid analysis result:', validAnalysis);
           setAnalysisResult(validAnalysis);
-          
-          // Test if the state was actually updated
-          setTimeout(() => {
-            console.log('Analysis result state after setting:', analysisResult);
-          }, 100);
         } else {
           console.warn('Received incomplete analysis result:', analysis);
           // Create a fallback analysis result
@@ -534,7 +526,35 @@ There was a network error while trying to analyze your results.
                       Execution Steps
                     </h4>
                     <div className="space-y-4 max-h-[600px] overflow-y-auto">
-                      {executionResult.execution_steps.map((step, index) => {
+                      {executionResult.execution_steps
+                        .filter((step) => {
+                          // Filter out unhelpful steps
+                          const action = step.action?.toLowerCase() || '';
+                          const result = step.result?.toLowerCase() || '';
+                          
+                          // Skip steps with unknown or generic actions
+                          if (action.includes('unknown') || action.includes('step') && action.includes(':')) {
+                            return false;
+                          }
+                          
+                          // Skip steps with generic results
+                          if (result.includes('results:') && result.includes('actions completed')) {
+                            return false;
+                          }
+                          
+                          // Skip steps with no meaningful content
+                          if (!step.action || step.action === 'N/A' || step.action.trim().length === 0) {
+                            return false;
+                          }
+                          
+                          // Skip steps with no meaningful results
+                          if (!step.result || step.result === 'N/A' || step.result.trim().length === 0) {
+                            return false;
+                          }
+                          
+                          return true;
+                        })
+                        .map((step, index) => {
                         // Enhanced step processing for better display
                         const actionType = step.action?.toLowerCase() || '';
                         const resultType = step.result?.toLowerCase() || '';
@@ -581,7 +601,10 @@ There was a network error while trying to analyze your results.
                           const actionLines = step.action.split('\n').filter((line: string) => line.trim());
                           if (actionLines.length > 0) {
                             const firstLine = actionLines[0].trim();
-                            if (firstLine.includes('extract') || firstLine.includes('found') || firstLine.includes('results')) {
+                            // Prioritize meaningful action descriptions
+                            if (firstLine.includes('extract') || firstLine.includes('found') || firstLine.includes('results') || 
+                                firstLine.includes('navigate') || firstLine.includes('click') || firstLine.includes('input') ||
+                                firstLine.includes('search') || firstLine.includes('capture')) {
                               actionSummary = firstLine;
                             } else if (firstLine.length > 60) {
                               actionSummary = firstLine.substring(0, 60) + '...';
@@ -605,7 +628,9 @@ There was a network error while trying to analyze your results.
                               line.includes('found') || 
                               line.includes('extracted') ||
                               line.includes('carryminati') ||
-                              line.includes('video')
+                              line.includes('video') ||
+                              line.includes('successfully') ||
+                              line.includes('completed')
                             );
                             
                             if (dataLine) {
@@ -615,13 +640,21 @@ There was a network error while trying to analyze your results.
                                 line !== dataLine && 
                                 line.trim() && 
                                 !line.includes('Results:') &&
-                                !line.includes('actions completed')
+                                !line.includes('actions completed') &&
+                                !line.includes('step') &&
+                                line.length > 10 // Only include lines with substantial content
                               );
                               if (additionalData.length > 0) {
                                 extractedData = additionalData.slice(0, 3); // Show up to 3 additional data points
                               }
                             } else {
-                              resultSummary = resultLines[0].trim();
+                              // Use the first meaningful line
+                              const meaningfulLine = resultLines.find((line: string) => 
+                                line.trim().length > 10 && 
+                                !line.includes('Results:') && 
+                                !line.includes('actions completed')
+                              );
+                              resultSummary = meaningfulLine ? meaningfulLine.trim() : resultLines[0].trim();
                             }
                           }
                         }
@@ -930,13 +963,6 @@ There was a network error while trying to analyze your results.
                      // Handle different types of analysis content with comprehensive validation
                      let content = analysisResult.analysis_content || analysisResult.analysis_report || 'No analysis content available';
                      
-                     console.log('Processing analysis content:', {
-                       hasAnalysisContent: !!analysisResult.analysis_content,
-                       hasAnalysisReport: !!analysisResult.analysis_report,
-                       contentLength: content ? content.length : 0,
-                       contentPreview: content ? content.substring(0, 200) : 'No content'
-                     });
-                     
                      // Enhanced detection of raw object representations
                      const isRawObject = typeof content === 'string' && (
                        content.startsWith('Run(') ||
@@ -1006,12 +1032,6 @@ ${analysisResult.detailed_analysis?.recommendations?.map((rec: string) => `- ${r
                      // Enhanced content processing to fix compliance logic and improve display
                      let processedContent = content;
                      
-                     console.log('Content before processing:', {
-                       originalContent: content ? content.substring(0, 200) : 'No content',
-                       isString: typeof content === 'string',
-                       length: content ? content.length : 0
-                     });
-                     
                      // Fix compliance status if it's incorrectly showing as "Fail" due to target_url_accessed flag
                      if (typeof processedContent === 'string' && processedContent.includes('Compliance Status: Fail')) {
                        // Check if the task actually completed successfully
@@ -1036,52 +1056,59 @@ ${analysisResult.detailed_analysis?.recommendations?.map((rec: string) => `- ${r
                        }
                      }
                      
-                     console.log('Final processed content:', {
-                       processedContent: processedContent ? processedContent.substring(0, 200) : 'No content',
-                       hasMarkdown: processedContent && (processedContent.includes('**') || processedContent.includes('##')),
-                       length: processedContent ? processedContent.length : 0
-                     });
+
                      
                      return (
                        <div className="max-h-96 overflow-y-auto">
-                         {processedContent && processedContent.includes('**') ? (
+                         {processedContent && (processedContent.includes('**') || processedContent.includes('*')) ? (
                            // Render markdown-style content with proper colors
                            <div className="space-y-4">
                              {processedContent.split('\n').map((line: string, index: number) => {
-                               if (line.startsWith('**') && line.endsWith('**')) {
+                               const trimmedLine = line.trim();
+                               
+                               if (trimmedLine.startsWith('**') && trimmedLine.endsWith('**')) {
                                  return (
                                    <h4 key={index} className="font-semibold text-white mt-6 mb-3 text-lg border-b border-[#A1A1A1]/20 pb-2">
-                                     {line.replace(/\*\*/g, '')}
+                                     {trimmedLine.replace(/\*\*/g, '')}
                                    </h4>
                                  );
-                               } else if (line.startsWith('##')) {
+                               } else if (trimmedLine.startsWith('##')) {
                                  return (
                                    <h3 key={index} className="font-bold text-[#D9653B] mt-8 mb-4 text-xl">
-                                     {line.replace(/##/g, '')}
+                                     {trimmedLine.replace(/##/g, '')}
                                    </h3>
                                  );
-                               } else if (line.startsWith('- ')) {
+                               } else if (trimmedLine.startsWith('- ')) {
                                  return (
                                    <div key={index} className="flex items-start space-x-3 mb-2">
                                      <span className="text-[#D9653B] mt-2 text-lg">•</span>
-                                     <span className="text-[#A1A1A1] leading-relaxed">{line.substring(2)}</span>
+                                     <span className="text-[#A1A1A1] leading-relaxed">{trimmedLine.substring(2)}</span>
                                    </div>
                                  );
-                               } else if (line.trim() && !line.startsWith('*')) {
+                               } else if (trimmedLine.startsWith('* ') && !trimmedLine.endsWith('*')) {
+                                 // Handle bullet points that start with * but don't end with *
+                                 return (
+                                   <div key={index} className="flex items-start space-x-3 mb-2">
+                                     <span className="text-[#D9653B] mt-2 text-lg">•</span>
+                                     <span className="text-[#A1A1A1] leading-relaxed">{trimmedLine.substring(2)}</span>
+                                   </div>
+                                 );
+                               } else if (trimmedLine.startsWith('* ') && trimmedLine.endsWith('*')) {
+                                 // Handle bullet points that start and end with *
+                                 return (
+                                   <div key={index} className="flex items-start space-x-3 mb-2">
+                                     <span className="text-[#D9653B] mt-2 text-lg">•</span>
+                                     <span className="text-[#A1A1A1] leading-relaxed">{trimmedLine.substring(2, trimmedLine.length - 1)}</span>
+                                   </div>
+                                 );
+                               } else if (trimmedLine && !trimmedLine.startsWith('*')) {
                                  return (
                                    <p key={index} className="text-white leading-relaxed mb-3">
-                                     {line}
+                                     {trimmedLine}
                                    </p>
                                  );
-                               } else if (line.startsWith('* ') && line.endsWith('*')) {
-                                 return (
-                                   <div key={index} className="flex items-start space-x-3 mb-2">
-                                     <span className="text-[#D9653B] mt-2 text-lg">•</span>
-                                     <span className="text-[#A1A1A1] leading-relaxed">{line.substring(2, line.length - 1)}</span>
-                                   </div>
-                                 );
                                }
-                               return <br key={index} />;
+                               return null; // Don't render empty lines
                              })}
                            </div>
                          ) : (
