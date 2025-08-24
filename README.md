@@ -1,6 +1,6 @@
 # WebSentinel - AI-Powered Web Testing Platform
 
-[![Demo Video](image/demo.png)](https://youtu.be/sE3TGDDeI4Q)
+[![Demo Video](images/demo.png)](https://youtu.be/sE3TGDDeI4Q)
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg?style=for-the-badge)](https://python.org)
 [![React](https://img.shields.io/badge/React-18+-blue.svg?style=for-the-badge)](https://reactjs.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg?style=for-the-badge)](https://fastapi.tiangolo.com)
