@@ -1,11 +1,11 @@
 # WebSentinel - AI-Powered Web Testing Platform
 
-[![Demo Video](https://img.shields.io/badge/Demo-Watch%20Video-blue?style=for-the-badge)](https://youtu.be/sE3TGDDeI4Q)
+[![Demo Video](image/demo.png)](https://youtu.be/sE3TGDDeI4Q)
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg?style=for-the-badge)](https://python.org)
 [![React](https://img.shields.io/badge/React-18+-blue.svg?style=for-the-badge)](https://reactjs.org)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg?style=for-the-badge)](https://fastapi.tiangolo.com)
 
-> **🏆 Built for AgentHack 2025** - A powerful web-based platform for automated website testing that combines browser automation with AI analysis, featuring real-time execution monitoring and comprehensive results visualization.
+> **🏆 Built for AgentHack 2025** - A powerful web-based platform for automated website testing that leverages Portia AI's agent framework to combine browser automation with intelligent AI analysis, featuring real-time execution monitoring and comprehensive results visualization.
 
 ## 📋 Table of Contents
 
@@ -22,7 +22,7 @@
 
 ## 🎯 Overview
 
-WebSentinel is a comprehensive web testing platform that leverages AI to automate website testing and analysis. It combines the power of browser automation with intelligent AI agents to provide detailed insights into web application behavior.
+WebSentinel is a comprehensive web testing platform that leverages Portia AI's agent framework to automate website testing and analysis. It combines the power of browser automation with intelligent, controllable AI agents to provide detailed insights into web application behavior.
 
 ### Key Capabilities
 
@@ -37,7 +37,7 @@ WebSentinel is a comprehensive web testing platform that leverages AI to automat
 
 ### Core Functionality
 - **Automated Web Testing**: Navigate, interact, and validate web applications
-- **AI Agent Intelligence**: Powered by Gemini 2.0 Flash for intelligent decision-making
+- **Portia AI Agent Framework**: Intelligent, controllable agents powered by Gemini 2.0 Flash for decision-making.
 - **Real-Time Execution**: Live monitoring of test progress and agent actions
 - **Visual Documentation**: Automatic screenshot capture at key moments
 - **Comprehensive Logging**: Detailed execution logs and agent thoughts
@@ -55,6 +55,7 @@ WebSentinel is a comprehensive web testing platform that leverages AI to automat
 - **Error Handling**: Robust error detection and reporting
 - **Log Management**: Organized storage and access to execution logs
 - **API Integration**: RESTful API for programmatic access
+- **Portia Agent Control**: Full visibility into agent reasoning and decision-making processes
 
 ## 🏗️ Architecture
 
@@ -73,7 +74,7 @@ WebSentinel is a comprehensive web testing platform that leverages AI to automat
 - **Frontend**: React 18, TypeScript, Tailwind CSS, Vite
 - **Backend**: FastAPI, Python 3.8+, Uvicorn
 - **Browser Automation**: Browser Use + Playwright
-- **AI Integration**: Google Gemini 2.0 Flash
+- **AI Agent Framework**: Portia AI with Google Gemini 2.0 Flash
 - **Real-time Updates**: Polling-based status monitoring
 
 ## 🚀 Quick Start
@@ -140,6 +141,8 @@ pip install fastapi uvicorn browser-use python-dotenv
 pip install portia-sdk-python[google]
 ```
 
+**Note**: The `portia-sdk-python[google]` package is essential for Portia AI agent functionality.
+
 #### Frontend Dependencies
 
 ```bash
@@ -178,15 +181,15 @@ DEBUG=true
    - **Screenshot Instructions**: Specific moments to capture (optional)
 
 2. **Execute the Test**
-   - Click "Execute Test" to start automation
+   - Click "Execute Test" to start Portia AI agent automation
    - Monitor real-time progress in the dashboard
-   - Watch agent reasoning and decision-making
+   - Watch Portia agent reasoning and decision-making processes
 
 3. **Review Results**
-   - **Execution Steps**: Timeline of all actions performed
+   - **Execution Steps**: Timeline of all Portia agent actions performed
    - **Screenshots**: Visual documentation of key moments
    - **Extracted Content**: Data found during execution
-   - **Analysis**: AI-powered insights and recommendations
+   - **Analysis**: AI-powered insights and recommendations from Portia agents
 
 ### Example Test Scenarios
 
@@ -254,7 +257,7 @@ DEBUG=true
 
 #### Execution Steps
 Each step shows:
-- **Action**: What was performed
+- **Action**: What the Portia agent performed
 - **Result**: Outcome of the action
 - **Timestamp**: When it occurred
 - **Screenshot**: Visual evidence (if available)
@@ -319,9 +322,9 @@ browser_config = BrowserConfig(
 )
 ```
 
-### Agent Instructions
+### Portia Agent Instructions
 
-The AI agent receives detailed instructions including:
+The Portia AI agent receives detailed instructions including:
 - Navigation objectives
 - Custom logging functions
 - Screenshot capture capabilities
@@ -371,11 +374,12 @@ pip list
 - Check browser console for errors
 - Verify Chrome/Chromium is installed
 
-#### Agent Thoughts Not Displaying
+#### Portia Agent Thoughts Not Displaying
 - Check if `agent_thoughts_[task_id].txt` file is created
 - Verify `/agent-thoughts/{task_id}` endpoint is accessible
 - Look for errors in browser console
 - Check file permissions in `operation_logs/`
+- Ensure Portia SDK is properly configured
 
 ### Debug Mode
 
@@ -395,9 +399,9 @@ Check these files for detailed error information:
 
 ```
 operation_logs/
-├── detailed_agent_log_[task].txt   # Comprehensive execution log
-├── agent_thoughts_[task].txt       # Agent reasoning & decisions
-├── agent_stdout_[task].txt         # Agent output capture
+├── detailed_agent_log_[task].txt   # Comprehensive Portia agent execution log
+├── agent_thoughts_[task].txt       # Portia agent reasoning & decisions
+├── agent_stdout_[task].txt         # Portia agent output capture
 ├── browser_execution_[task].json   # Detailed execution results
 └── review_report_[task].json       # AI analysis report
 ```
@@ -407,7 +411,7 @@ operation_logs/
 ```
 WebSentinel/
 ├── api_server.py              # FastAPI backend server
-├── website_testing_agent.py   # Core agent logic
+├── website_testing_agent.py   # Core Portia AI agent logic
 ├── requirements.txt           # Python dependencies
 ├── .env                      # Environment variables
 ├── operation_logs/           # Generated logs and screenshots
@@ -493,8 +497,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- **Portia AI** for the powerful agent framework
-- **Google Gemini** for AI capabilities
+- **Portia AI** for the powerful, controllable agent framework that powers WebSentinel's intelligent automation
+- **Google Gemini** for AI capabilities integrated through Portia
 - **Browser Use** for web automation
 - **FastAPI** for the robust backend
 - **React** for the modern frontend
@@ -518,6 +522,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **🏆 Enjoy automated website testing with AI-powered insights!**
 
-WebSentinel combines the power of modern web development with intelligent AI agents to create a comprehensive, user-friendly testing solution.
+WebSentinel combines the power of modern web development with Portia AI's intelligent, controllable agent framework to create a comprehensive, user-friendly testing solution.
 
-**Built for AgentHack 2025** - Demonstrating the future of AI-powered web automation and testing.
+**Built for AgentHack 2025** - Demonstrating the future of AI-powered web automation and testing through Portia's agent capabilities.

@@ -671,7 +671,7 @@ There was a network error while trying to analyze your results.
                         let actionSummary = 'No action specified';
                         if (isEnhancedStep && step.action_summary && step.action_summary !== 'N/A') {
                           actionSummary = step.action_summary;
-                        } else if (step.action && step.action !== 'N/A') {
+                        } else if (!isEnhancedStep && step.action && step.action !== 'N/A') {
                           const actionLines = step.action.split('\n').filter((line: string) => line.trim());
                           if (actionLines.length > 0) {
                             const firstLine = actionLines[0].trim();
@@ -694,7 +694,7 @@ There was a network error while trying to analyze your results.
                         
                         if (isEnhancedStep && step.result_summary && step.result_summary !== 'N/A') {
                           resultSummary = step.result_summary;
-                        } else if (step.result && step.result !== 'N/A') {
+                        } else if (!isEnhancedStep && step.result && step.result !== 'N/A') {
                           const resultLines = step.result.split('\n').filter((line: string) => line.trim());
                           if (resultLines.length > 0) {
                             // Look for actual extracted data in results
