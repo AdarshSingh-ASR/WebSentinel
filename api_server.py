@@ -5,7 +5,6 @@ import asyncio
 import sys
 import io
 import logging
-import re
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -301,18 +300,24 @@ class BrowserExecutor:
             "decisions": []
         }
         
-        # Collect thoughts for this step (rough correlation by order)
-        thoughts_per_step = max(1, len(agent_thoughts) // max(1, step_number)) if agent_thoughts else 0
-        start_idx = (step_number - 1) * thoughts_per_step
-        end_idx = min(len(agent_thoughts), start_idx + thoughts_per_step + 2)  # Allow some overlap
-        
-        for thought in agent_thoughts[start_idx:end_idx]:
-            if thought["type"] == "action":
-                step_thoughts["actions"].append(thought["message"])
-            elif thought["type"] == "observation":
-                step_thoughts["observations"].append(thought["message"])
-            elif thought["type"] == "decision":
-                step_thoughts["decisions"].append(thought["message"])
+        # Better thought matching - use step number to find relevant thoughts
+        # Since thoughts are logged in order, we can use step number as an index
+        if agent_thoughts:
+            # For step 1, use first few thoughts, for step 2, use next few, etc.
+            thoughts_per_step = 3  # Assume roughly 3 thoughts per step (action, observation, decision)
+            start_idx = (step_number - 1) * thoughts_per_step
+            end_idx = min(len(agent_thoughts), start_idx + thoughts_per_step)
+            
+            # Get thoughts for this step
+            step_thoughts_list = agent_thoughts[start_idx:end_idx]
+            
+            for thought in step_thoughts_list:
+                if thought["type"] == "action":
+                    step_thoughts["actions"].append(thought["message"])
+                elif thought["type"] == "observation":
+                    step_thoughts["observations"].append(thought["message"])
+                elif thought["type"] == "decision":
+                    step_thoughts["decisions"].append(thought["message"])
         
         # If we have specific actions with log_action details, match them
         if actions:
@@ -327,15 +332,20 @@ class BrowserExecutor:
                         elif action["type"] == "log_decision":
                             step_thoughts["decisions"].append(message)
         
-        # Create human-readable action summary
+        # Create human-readable action summary with priority order
+        action_summary = "Unknown action"
+        
+        # Priority 1: Use action thoughts (most descriptive)
         if step_thoughts["actions"]:
-            action_summary = step_thoughts["actions"][0]  # Use first action as main summary
+            action_summary = step_thoughts["actions"][0]
+        # Priority 2: Use decision thoughts (shows reasoning)
         elif step_thoughts["decisions"]:
-            action_summary = f"Decision: {step_thoughts['decisions'][0]}"
+            action_summary = step_thoughts["decisions"][0]
+        # Priority 3: Use observation thoughts (shows what was seen)
         elif step_thoughts["observations"]:
-            action_summary = f"Observation: {step_thoughts['observations'][0]}"
+            action_summary = step_thoughts["observations"][0]
+        # Priority 4: Fall back to technical summary
         else:
-            # Fall back to technical summary
             if actions:
                 technical_actions = [a["type"] for a in actions if a["type"] not in ["log_action", "log_observation", "log_decision"]]
                 if technical_actions:
@@ -368,7 +378,7 @@ class BrowserExecutor:
                 with open(thoughts_file, 'r', encoding='utf-8') as f:
                     for line in f:
                         line = line.strip()
-                        if line and ('] ACTION:' in line or '] OBSERVATION:' in line or '] DECISION:' in line):
+                        if line and ('] ACTION:' in line or '] ⚡ ACTION:' in line or '] OBSERVATION:' in line or '] 👁️ OBSERVATION:' in line or '] DECISION:' in line or '] 🧭 DECISION:' in line):
                             # Parse timestamp and content
                             parts = line.split('] ', 1)
                             if len(parts) == 2:
@@ -377,7 +387,9 @@ class BrowserExecutor:
                                 
                                 # Extract action type and message
                                 if ': ' in content_part:
-                                    action_type, message = content_part.split(': ', 1)
+                                    # Handle emoji prefixes
+                                    content_part_clean = content_part.replace('⚡ ', '').replace('👁️ ', '').replace('🧭 ', '')
+                                    action_type, message = content_part_clean.split(': ', 1)
                                     thoughts.append({
                                         "timestamp": timestamp_part,
                                         "type": action_type.lower(),
@@ -755,77 +767,11 @@ class BrowserExecutor:
                     
                     # Add conversation details if available
                     if step_info["action"] != "N/A":
-                        # Create enhanced conversation entry with rich data
-                        conversation_entry = {
+                        results["full_conversation"].append({
                             "step": i + 1,
                             "model_output": step_info["action"],
-                            "timestamp": step_info["timestamp"],
-                            "conversation_data": {}
-                        }
-                        
-                        # Try to extract rich conversation data from the step
-                        if hasattr(step, 'model_output') and step.model_output:
-                            # Look for enhanced logging patterns in the model output
-                            model_output = str(step.model_output)
-                            
-                            # Extract observations
-                            if '👁️ [OBSERVE]' in model_output:
-                                obs_match = re.search(r'👁️ \[OBSERVE\] Agent Log: OBSERVATION:\s*(.+?)(?:\n|$)', model_output)
-                                if obs_match:
-                                    conversation_entry["conversation_data"]["observation"] = obs_match.group(1).strip()
-                            
-                            # Extract extractions
-                            if '⚡ [EXTRACT]' in model_output:
-                                extract_match = re.search(r'⚡ \[EXTRACT\] Agent Log: EXTRACTION: ✅ Extracted (.+?): (.+?)(?:\n|$)', model_output)
-                                if extract_match:
-                                    conversation_entry["conversation_data"]["extraction"] = {
-                                        "type": extract_match.group(1).strip(),
-                                        "content": extract_match.group(2).strip()
-                                    }
-                            
-                            # Extract decisions
-                            if '🧭 [DECISION]' in model_output:
-                                decision_match = re.search(r'🧭 \[DECISION\] Agent Log: DECISION:\s*(.+?)(?:\n|$)', model_output)
-                                if decision_match:
-                                    conversation_entry["conversation_data"]["decision"] = decision_match.group(1).strip()
-                            
-                            # Extract actions (including interactions)
-                            if '⚡ [ACTION]' in model_output:
-                                action_match = re.search(r'⚡ \[ACTION\] Agent Log: ACTION:\s*(.+?)(?:\n|$)', model_output)
-                                if action_match:
-                                    conversation_entry["conversation_data"]["action"] = action_match.group(1).strip()
-                            
-                            # Extract interactions (which are also actions)
-                            if '⚡ [INTERACT]' in model_output:
-                                interact_match = re.search(r'⚡ \[INTERACT\] Agent Log: INTERACTION:\s*(.+?)(?:\n|$)', model_output)
-                                if interact_match:
-                                    # Add to actions if not already present
-                                    if "action" not in conversation_entry["conversation_data"]:
-                                        conversation_entry["conversation_data"]["action"] = interact_match.group(1).strip()
-                                    else:
-                                        # Append to existing action
-                                        conversation_entry["conversation_data"]["action"] += f"\n{interact_match.group(1).strip()}"
-                            
-                            # Look for extracted content from page
-                            if '📄  Extracted from page' in model_output:
-                                # Try to find JSON content after the extraction marker
-                                json_match = re.search(r'📄  Extracted from page\s*:\s*```json\s*(\{.*?\})\s*```', model_output, re.DOTALL)
-                                if json_match:
-                                    try:
-                                        extracted_json = json.loads(json_match.group(1))
-                                        conversation_entry["conversation_data"]["extracted_page_content"] = extracted_json
-                                    except json.JSONDecodeError:
-                                        # If JSON parsing fails, capture as raw text
-                                        conversation_entry["conversation_data"]["extracted_page_content"] = json_match.group(1)
-                        
-                        # Also try to get data from other attributes
-                        if hasattr(step, 'extracted_content') and step.extracted_content:
-                            conversation_entry["conversation_data"]["extracted_content"] = step.extracted_content
-                        
-                        if hasattr(step, 'metadata') and step.metadata:
-                            conversation_entry["conversation_data"]["metadata"] = step.metadata
-                        
-                        results["full_conversation"].append(conversation_entry)
+                            "timestamp": step_info["timestamp"]
+                        })
                     
                     results["execution_steps"].append(step_info)
                     results["enhanced_steps"].append(enhanced_step)
@@ -2002,58 +1948,6 @@ async def list_tasks():
             for task_id, info in task_storage.items()
         ]
     }
-
-@app.get("/logs/{task_id}/stdout")
-async def get_stdout_log(task_id: str):
-    """Get stdout log file content for a task."""
-    try:
-        # Look for stdout log file
-        stdout_file_pattern = f"agent_stdout_{task_id}_*.txt"
-        stdout_file = None
-        
-        # Search in logs directory
-        logs_dir = Path("./operation_logs")
-        for file_path in logs_dir.glob(stdout_file_pattern):
-            stdout_file = file_path
-            break
-        
-        if not stdout_file or not stdout_file.exists():
-            return "No stdout log file found for this task."
-        
-        # Read and return file content
-        with open(stdout_file, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        return content
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error reading stdout log: {str(e)}")
-
-@app.get("/logs/{task_id}/detailed")
-async def get_detailed_log(task_id: str):
-    """Get detailed agent log file content for a task."""
-    try:
-        # Look for detailed log file
-        detailed_file_pattern = f"detailed_agent_log_{task_id}_*.txt"
-        detailed_file = None
-        
-        # Search in logs directory
-        logs_dir = Path("./operation_logs")
-        for file_path in logs_dir.glob(detailed_file_pattern):
-            detailed_file = file_path
-            break
-        
-        if not detailed_file or not detailed_file.exists():
-            return "No detailed log file found for this task."
-        
-        # Read and return file content
-        with open(detailed_file, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        return content
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error reading detailed log: {str(e)}")
 
 @app.get("/agent-thoughts/{task_id}")
 async def get_agent_thoughts(task_id: str):

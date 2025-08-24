@@ -53,13 +53,21 @@ interface ExecutionResult {
   enhanced_steps?: EnhancedStep[];
   screenshots: string[];
   screenshot_urls: string[];
-  full_conversation: any[];
+  extracted_content?: ExtractedContent[];
   error?: string;
   log_file?: string;
   detailed_log_file?: string;
   stdout_log_file?: string;
   stderr_log_file?: string;
   agent_thoughts_file?: string;
+}
+
+interface ExtractedContent {
+  step_number: number;
+  timestamp: string;
+  content: string;
+  data_type?: string;
+  success?: boolean;
 }
 
 interface AnalysisResult {
@@ -90,8 +98,7 @@ function App() {
   const [taskStatus, setTaskStatus] = useState<TaskStatus | null>(null);
   const [executionResult, setExecutionResult] = useState<ExecutionResult | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-  const [stdoutLogs, setStdoutLogs] = useState<string>('');
-
+  
 
   const [isExecuting, setIsExecuting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -105,88 +112,6 @@ function App() {
       }
     };
   }, [pollingInterval]);
-
-  // Function to fetch stdout logs for rich terminal information
-  const fetchStdoutLogs = async (taskId: string) => {
-    try {
-      const response = await fetch(`http://localhost:8000/logs/${taskId}/stdout`);
-      if (response.ok) {
-        const stdoutContent = await response.text();
-        setStdoutLogs(stdoutContent);
-        return stdoutContent;
-      }
-    } catch (error) {
-      console.warn('Failed to fetch stdout logs:', error);
-    }
-    return '';
-  };
-
-  // Function to parse rich information from stdout logs
-  const parseRichLogsFromStdout = (stdoutContent: string, stepNumber: number) => {
-    const richInfo = {
-      actions: [] as string[],
-      observations: [] as string[],
-      decisions: [] as string[],
-      extractions: [] as Array<{type: string, content: string, icon: string}>,
-      interactions: [] as string[],
-      navigations: [] as string[],
-      screenshots: [] as string[]
-    };
-
-    if (!stdoutContent) return richInfo;
-
-    const lines = stdoutContent.split('\n');
-    
-    for (const line of lines) {
-      // Parse ACTION logs
-      const actionMatch = line.match(/⚡ \[ACTION\] Agent Log: ACTION:\s*(.+)$/);
-      if (actionMatch) {
-        richInfo.actions.push(actionMatch[1].trim());
-      }
-
-      // Parse OBSERVE logs
-      const observeMatch = line.match(/👁️ \[OBSERVE\] Agent Log: OBSERVATION:\s*(.+)$/);
-      if (observeMatch) {
-        richInfo.observations.push(observeMatch[1].trim());
-      }
-
-      // Parse DECISION logs
-      const decisionMatch = line.match(/🧭 \[DECISION\] Agent Log: DECISION:\s*(.+)$/);
-      if (decisionMatch) {
-        richInfo.decisions.push(decisionMatch[1].trim());
-      }
-
-      // Parse EXTRACT logs
-      const extractMatch = line.match(/⚡ \[EXTRACT\] Agent Log: EXTRACTION:\s*✅\s*Extracted\s+(.+?):\s*(.+)$/);
-      if (extractMatch) {
-        richInfo.extractions.push({
-          type: extractMatch[1].trim(),
-          content: extractMatch[2].trim(),
-          icon: '⚡'
-        });
-      }
-
-      // Parse INTERACT logs
-      const interactMatch = line.match(/⚡ \[INTERACT\] Agent Log: INTERACTION:\s*(.+)$/);
-      if (interactMatch) {
-        richInfo.interactions.push(interactMatch[1].trim());
-      }
-
-      // Parse NAV logs
-      const navMatch = line.match(/✅ \[NAV\] Agent Log: NAVIGATION:\s*(.+)$/);
-      if (navMatch) {
-        richInfo.navigations.push(navMatch[1].trim());
-      }
-
-      // Parse SCREENSHOT logs
-      const screenshotMatch = line.match(/💭 \[SCREENSHOT\] Agent Log: 📸\s*(.+)$/);
-      if (screenshotMatch) {
-        richInfo.screenshots.push(screenshotMatch[1].trim());
-      }
-    }
-
-    return richInfo;
-  };
 
   // Poll task status
   useEffect(() => {
@@ -208,11 +133,6 @@ function App() {
                 if (resultsResponse.ok) {
                   const results = await resultsResponse.json();
                   setExecutionResult(results);
-                  
-                  // Fetch stdout logs for rich terminal information
-                  if (currentTaskId) {
-                    await fetchStdoutLogs(currentTaskId);
-                  }
                 }
               }
             }
@@ -226,11 +146,6 @@ function App() {
     
     return () => clearInterval(interval);
   }, [currentTaskId, isExecuting]);
-
-
-
-          
-          
 
   const executeTest = async (testConfig: TestConfig) => {
     console.log('executeTest called with:', testConfig); // Debug log
@@ -284,9 +199,6 @@ function App() {
                     const executionResults = await resultsResponse.json();
                     console.log('Execution results:', executionResults);
                     setExecutionResult(executionResults);
-                    
-                    // Fetch stdout logs for rich terminal information
-                    await fetchStdoutLogs(taskId);
                   }
                 }
               }
@@ -439,7 +351,66 @@ There was a network error while trying to analyze your results.
     }
   };
 
-
+  // Process extracted content from execution steps
+  const processExtractedContent = (executionResult: ExecutionResult): ExtractedContent[] => {
+    const extractedContent: ExtractedContent[] = [];
+    
+    if (executionResult.enhanced_steps) {
+      executionResult.enhanced_steps.forEach((step, index) => {
+        if (step.result_details && step.result_details.results) {
+          step.result_details.results.forEach((result: any) => {
+            if (result.content && (result.content.includes('extracted') || result.content.includes('Extracted') || result.content.includes('EXTRACTION'))) {
+              extractedContent.push({
+                step_number: step.step_number || index + 1,
+                timestamp: step.timestamp || new Date().toISOString(),
+                content: result.content,
+                data_type: result.content.includes('search result') ? 'search_result' : 
+                          result.content.includes('EXTRACTION') ? 'extracted_data' : 'general',
+                success: result.success !== false
+              });
+            }
+          });
+        }
+      });
+    }
+    
+    // Also check regular execution steps
+    if (executionResult.execution_steps) {
+      executionResult.execution_steps.forEach((step, index) => {
+        if (step.result && (step.result.includes('extracted') || step.result.includes('Extracted') || step.result.includes('EXTRACTION'))) {
+          extractedContent.push({
+            step_number: step.step_number || index + 1,
+            timestamp: step.timestamp || new Date().toISOString(),
+            content: step.result,
+                            data_type: step.result.includes('search result') ? 'search_result' : 
+                          step.result.includes('EXTRACTION') ? 'extracted_data' : 'general',
+            success: true
+          });
+        }
+      });
+    }
+    
+    // Check for extracted content in action details
+    if (executionResult.enhanced_steps) {
+      executionResult.enhanced_steps.forEach((step, index) => {
+        if (step.action_details && step.action_details.actions) {
+          step.action_details.actions.forEach((action: any) => {
+            if (action.details && action.details.extracted_content) {
+              extractedContent.push({
+                step_number: step.step_number || index + 1,
+                timestamp: step.timestamp || new Date().toISOString(),
+                content: action.details.extracted_content,
+                data_type: 'extracted_data',
+                success: true
+              });
+            }
+          });
+        }
+      });
+    }
+    
+    return extractedContent;
+  };
 
   return (
     <div className="min-h-screen bg-[#1E1E1E]">
@@ -559,7 +530,7 @@ There was a network error while trying to analyze your results.
                   
                   <div className="notion-surface p-4 text-center">
                     <div className="text-2xl font-bold text-[#D9653B] mb-1">
-                      {executionResult.execution_steps?.length || 0}
+                      {(executionResult.enhanced_steps || executionResult.execution_steps)?.length || 0}
                     </div>
                     <div className="text-xs text-[#A1A1A1]">Steps Executed</div>
                   </div>
@@ -576,9 +547,12 @@ There was a network error while trying to analyze your results.
                   
                   <div className="notion-surface p-4 text-center">
                     <div className="text-2xl font-bold text-[#D9653B] mb-1">
-                      {executionResult.full_conversation?.length || 0}
+                      {(() => {
+                        const extractedContent = processExtractedContent(executionResult);
+                        return extractedContent.length;
+                      })()}
                     </div>
-                    <div className="text-xs text-[#A1A1A1]">AI Messages</div>
+                    <div className="text-xs text-[#A1A1A1]">Extracted Content</div>
                   </div>
                 </div>
 
@@ -614,39 +588,65 @@ There was a network error while trying to analyze your results.
                   </div>
                 )}
 
-                {/* Execution Steps */}
-                {executionResult.execution_steps && executionResult.execution_steps.length > 0 && (
+                                {/* Execution Steps */}
+                {(executionResult.enhanced_steps || executionResult.execution_steps) && (executionResult.enhanced_steps || executionResult.execution_steps).length > 0 && (
                   <div className="mb-6">
                     <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                       <BarChart3 className="h-5 w-5 text-[#D9653B]" />
                       Execution Steps
                     </h4>
                     <div className="space-y-4 max-h-[600px] overflow-y-auto">
-                      {executionResult.execution_steps
+                      {(executionResult.enhanced_steps || executionResult.execution_steps)
                         .filter((step) => {
-                          // Show all steps except completely empty ones
-                          const hasAction = step.action && step.action !== 'N/A' && step.action.trim().length > 0;
-                          const hasResult = step.result && step.result !== 'N/A' && step.result.trim().length > 0;
+                          // Filter out unhelpful steps
+                          const isEnhancedStep = 'action_summary' in step;
+                          const action = (isEnhancedStep ? step.action_summary : step.action)?.toLowerCase() || '';
+                          const result = (isEnhancedStep ? step.result_summary : step.result)?.toLowerCase() || '';
                           
-                          // Keep any step that has either action or result content
-                          return hasAction || hasResult;
+                          // Skip steps with unknown or generic actions
+                          if (action.includes('unknown') || action.includes('step') && action.includes(':')) {
+                            return false;
+                          }
+                          
+                          // Skip steps with generic results
+                          if (result.includes('results:') && result.includes('actions completed')) {
+                            return false;
+                          }
+                          
+                          // Skip steps with no meaningful content
+                          if (!(isEnhancedStep ? step.action_summary : step.action) || (isEnhancedStep ? step.action_summary : step.action) === 'N/A' || (isEnhancedStep ? step.action_summary : step.action).trim().length === 0) {
+                            return false;
+                          }
+                          
+                          // Skip steps with no meaningful results
+                          if (!(isEnhancedStep ? step.result_summary : step.result) || (isEnhancedStep ? step.result_summary : step.result) === 'N/A' || (isEnhancedStep ? step.result_summary : step.result).trim().length === 0) {
+                            return false;
+                          }
+                          
+                          return true;
                         })
                         .map((step, index) => {
                         // Enhanced step processing for better display
-                        const actionType = step.action?.toLowerCase() || '';
-                        const resultType = step.result?.toLowerCase() || '';
+                        const isEnhancedStep = 'action_summary' in step;
+                        const actionType = (isEnhancedStep ? step.action_summary : step.action)?.toLowerCase() || '';
+                        const resultType = (isEnhancedStep ? step.result_summary : step.result)?.toLowerCase() || '';
                         
                         // Determine step status
                         let stepStatus = 'unknown';
+                        let statusColor = 'text-[#A1A1A1]';
                         
                         if (resultType.includes('success') || resultType.includes('completed') || resultType.includes('done')) {
                           stepStatus = 'SUCCESS';
+                          statusColor = 'text-green-400';
                         } else if (resultType.includes('failed') || resultType.includes('error') || resultType.includes('timeout')) {
                           stepStatus = 'FAILED';
+                          statusColor = 'text-red-400';
                         } else if (resultType.includes('[]') || resultType.includes('empty')) {
                           stepStatus = 'EMPTY';
-                        } else if (step.result && step.result !== 'N/A' && step.result.length > 0) {
+                          statusColor = 'text-yellow-400';
+                        } else if ((isEnhancedStep ? step.result_summary : step.result) && (isEnhancedStep ? step.result_summary : step.result) !== 'N/A' && (isEnhancedStep ? step.result_summary : step.result).length > 0) {
                           stepStatus = 'COMPLETED';
+                          statusColor = 'text-blue-400';
                         }
                         
                         // Determine action type for better categorization
@@ -667,13 +667,34 @@ There was a network error while trying to analyze your results.
                           actionCategory = 'Data Extraction';
                         }
                         
-
+                        // Create meaningful action summary
+                        let actionSummary = 'No action specified';
+                        if (isEnhancedStep && step.action_summary && step.action_summary !== 'N/A') {
+                          actionSummary = step.action_summary;
+                        } else if (step.action && step.action !== 'N/A') {
+                          const actionLines = step.action.split('\n').filter((line: string) => line.trim());
+                          if (actionLines.length > 0) {
+                            const firstLine = actionLines[0].trim();
+                            // Prioritize meaningful action descriptions
+                            if (firstLine.includes('extract') || firstLine.includes('found') || firstLine.includes('results') || 
+                                firstLine.includes('navigate') || firstLine.includes('click') || firstLine.includes('input') ||
+                                firstLine.includes('search') || firstLine.includes('capture')) {
+                              actionSummary = firstLine;
+                            } else if (firstLine.length > 60) {
+                              actionSummary = firstLine.substring(0, 60) + '...';
+                            } else {
+                              actionSummary = firstLine;
+                            }
+                          }
+                        }
                         
                         // Create meaningful result summary with extracted data
                         let resultSummary = 'No result available';
                         let extractedData = null;
                         
-                        if (step.result && step.result !== 'N/A') {
+                        if (isEnhancedStep && step.result_summary && step.result_summary !== 'N/A') {
+                          resultSummary = step.result_summary;
+                        } else if (step.result && step.result !== 'N/A') {
                           const resultLines = step.result.split('\n').filter((line: string) => line.trim());
                           if (resultLines.length > 0) {
                             // Look for actual extracted data in results
@@ -735,13 +756,13 @@ There was a network error while trying to analyze your results.
                                     </div>
                                   </div>
                                 </div>
-                                {step.screenshot_url && (
+                                {(isEnhancedStep ? step.screenshot_url : step.screenshot_url) && (
                                   <div className="flex-shrink-0">
                                     <img
-                                      src={`${API_BASE_URL}${step.screenshot_url}`}
+                                      src={`${API_BASE_URL}${isEnhancedStep ? step.screenshot_url : step.screenshot_url}`}
                                       alt={`Step ${step.step_number} preview`}
                                       className="w-16 h-12 object-cover border border-[#A1A1A1]/20 rounded cursor-pointer hover:border-[#D9653B]/50 transition-colors"
-                                      onClick={() => window.open(`${API_BASE_URL}${step.screenshot_url}`, '_blank')}
+                                      onClick={() => window.open(`${API_BASE_URL}${isEnhancedStep ? step.screenshot_url : step.screenshot_url}`, '_blank')}
                                       onError={(e) => {
                                         e.currentTarget.style.display = 'none';
                                       }}
@@ -758,240 +779,22 @@ There was a network error while trying to analyze your results.
                                   </span>
                                   <span className="text-xs text-[#A1A1A1]">{actionCategory}</span>
                                 </div>
-                                
-
                                 <div className="bg-[#252525] border border-[#A1A1A1]/20 rounded-lg p-3">
                                   <div className="text-sm font-medium text-white mb-1">
-                                    {(() => {
-                                      // Show ⚡ [ACTION] and 🧭 [DECISION] content from conversation logs
-                                      if (executionResult.full_conversation) {
-                                        const stepConversations = executionResult.full_conversation.filter((conv: any) => 
-                                          conv.step === step.step_number
-                                        );
-                                        
-                                        const actions: string[] = [];
-                                        const decisions: string[] = [];
-                                        
-                                        stepConversations.forEach((stepConv: any) => {
-                                          // Get structured action data
-                                          if (stepConv.conversation_data && stepConv.conversation_data.action) {
-                                            actions.push(stepConv.conversation_data.action);
-                                          }
-                                          
-                                          // Get structured decision data
-                                          if (stepConv.conversation_data && stepConv.conversation_data.decision) {
-                                            decisions.push(stepConv.conversation_data.decision);
-                                          }
-                                          
-                                          // Also parse from model_output for additional patterns
-                                          if (stepConv.model_output) {
-                                            const modelOutput = stepConv.model_output;
-                                            
-                                            // Look for ⚡ [INTERACT] patterns
-                                            const interactMatches = modelOutput.match(/⚡ \[INTERACT\] Agent Log: INTERACTION:\s*(.+?)(?:\n|$)/g);
-                                            if (interactMatches) {
-                                              interactMatches.forEach((match: string) => {
-                                                const content = match.replace(/⚡ \[INTERACT\] Agent Log: INTERACTION:\s*/, '').trim();
-                                                if (content && !actions.includes(content)) {
-                                                  actions.push(content);
-                                                }
-                                              });
-                                            }
-                                            
-                                            // Look for 🧭 [DECISION] patterns if not already captured
-                                            if (decisions.length === 0) {
-                                              const decisionMatches = modelOutput.match(/🧭 \[DECISION\] Agent Log: DECISION:\s*(.+?)(?:\n|$)/g);
-                                              if (decisionMatches) {
-                                                decisionMatches.forEach((match: string) => {
-                                                  const content = match.replace(/🧭 \[DECISION\] Agent Log: DECISION:\s*/, '').trim();
-                                                  if (content && !decisions.includes(content)) {
-                                                    decisions.push(content);
-                                                  }
-                                                });
-                                              }
-                                            }
-                                          }
-                                        });
-                                        
-                                        // Display actions and decisions
-                                        const content = [];
-                                        if (actions.length > 0) {
-                                          actions.forEach(action => {
-                                            if (action.includes('✅')) {
-                                              content.push(`⚡ [INTERACT] ${action}`);
-                                            } else {
-                                              content.push(`⚡ [ACTION] ${action}`);
-                                            }
-                                          });
-                                        }
-                                        if (decisions.length > 0) {
-                                          content.push(...decisions.map(decision => `🧭 [DECISION] ${decision}`));
-                                        }
-                                        
-                                        if (content.length > 0) {
-                                          return content.join('\n');
-                                        }
-                                      }
-                                      
-                                      // Fallback to step.action if no conversation data
-                                      return step.action || 'No action specified';
-                                    })()}
+                                    {actionSummary}
                                   </div>
-                                  
-                                  {/* Show detailed action breakdown if available */}
-                                  {(() => {
-                                    // Parse rich logs from stdout for this step
-                                    const richInfo = parseRichLogsFromStdout(stdoutLogs, step.step_number);
-                                    const actionDetails: Array<{type: string, content: string, icon: string}> = [];
-                                    
-                                    // Add actions
-                                    richInfo.actions.forEach(action => {
-                                      actionDetails.push({
-                                        type: 'Action',
-                                        content: action,
-                                        icon: '⚡'
-                                      });
-                                    });
-                                    
-                                    // Add decisions
-                                    richInfo.decisions.forEach(decision => {
-                                      actionDetails.push({
-                                        type: 'Decision',
-                                        content: decision,
-                                        icon: '🧭'
-                                      });
-                                    });
-                                    
-                                    // Add interactions
-                                    richInfo.interactions.forEach(interaction => {
-                                      actionDetails.push({
-                                        type: 'Interaction',
-                                        content: interaction,
-                                        icon: '⚡'
-                                      });
-                                    });
-                                    
-                                    // Add navigations
-                                    richInfo.navigations.forEach(navigation => {
-                                      actionDetails.push({
-                                        type: 'Navigation',
-                                        content: navigation,
-                                        icon: '✅'
-                                      });
-                                    });
-                                    
-                                    // Add screenshots
-                                    richInfo.screenshots.forEach(screenshot => {
-                                      actionDetails.push({
-                                        type: 'Screenshot',
-                                        content: screenshot,
-                                        icon: '💭'
-                                      });
-                                    });
-                                    
-                                    // Add extractions
-                                    richInfo.extractions.forEach(extraction => {
-                                      actionDetails.push(extraction);
-                                    });
-                                    
-                                    if (actionDetails.length > 0) {
-                                      return (
-                                        <div className="mt-3 space-y-2">
-                                          {actionDetails.map((detail, idx) => (
-                                            <div key={idx} className="p-2 bg-[#1E1E1E] rounded border border-[#A1A1A1]/20">
-                                              <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-sm">{detail.icon}</span>
-                                                <span className="text-xs text-[#D9653B] font-medium">{detail.type}</span>
-                                              </div>
-                                              <div className="text-xs text-white">{detail.content}</div>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      );
-                                    }
-                                    return null;
-                                  })()}
-                                  
-                                  {step.action && step.action !== 'N/A' && step.action.split('\n').length > 1 && (
+                                  {(isEnhancedStep ? step.action_details : step.action) && (isEnhancedStep ? step.action_details : step.action) !== 'N/A' && (isEnhancedStep ? JSON.stringify(step.action_details).split('\n').length > 1 : step.action.split('\n').length > 1) && (
                                     <details className="mt-2">
                                       <summary className="text-xs text-[#D9653B] cursor-pointer hover:text-[#D9653B]/80">
                                         Show full action details
                                       </summary>
                                       <div className="mt-2 p-2 bg-[#1E1E1E] rounded border border-[#A1A1A1]/20 text-xs text-[#A1A1A1] max-h-32 overflow-y-auto font-mono">
-                                        {step.action}
+                                        {isEnhancedStep ? JSON.stringify(step.action_details, null, 2) : step.action}
                                       </div>
                                     </details>
                                   )}
                                 </div>
                               </div>
-                              
-                                            {/* Observe Section */}
-              {(() => {
-                // Parse rich logs from stdout for this step
-                const richInfo = parseRichLogsFromStdout(stdoutLogs, step.step_number);
-                
-                // Display observations if any found
-                if (richInfo.observations.length > 0) {
-                  return (
-                    <div className="mb-4">
-                      <div className="flex items-center space-x-2 mb-2">
-                        <span className="text-xs font-semibold text-green-400 bg-green-400/10 px-2 py-1 rounded uppercase tracking-wide border border-green-400/20">
-                          Observe
-                        </span>
-                      </div>
-                      <div className="bg-[#252525] border border-[#A1A1A1]/20 rounded-lg p-3">
-                        <div className="space-y-2">
-                          {richInfo.observations.map((observation, idx) => (
-                            <div key={idx} className="p-2 bg-[#1E1E1E] rounded border border-[#A1A1A1]/20">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-sm">👁️</span>
-                                <span className="text-xs text-green-400 font-medium">Observation</span>
-                              </div>
-                              <div className="text-xs text-white">{observation}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
-                
-                return null;
-              })()}
-                              
-                              {/* Extraction Section - Show ⚡ [EXTRACT] and 📄 data */}
-                              {(() => {
-                                // Parse rich logs from stdout for this step
-                                const richInfo = parseRichLogsFromStdout(stdoutLogs, step.step_number);
-                                
-                                // Display extractions if any found
-                                if (richInfo.extractions.length > 0) {
-                                  return (
-                                    <div className="mb-4">
-                                      <div className="flex items-center space-x-2 mb-2">
-                                        <span className="text-xs font-semibold text-purple-400 bg-purple-400/10 px-2 py-1 rounded uppercase tracking-wide border border-purple-400/20">
-                                          Extraction
-                                        </span>
-                                      </div>
-                                      <div className="bg-[#252525] border border-[#A1A1A1]/20 rounded-lg p-3">
-                                        <div className="space-y-2">
-                                          {richInfo.extractions.map((extraction, idx) => (
-                                            <div key={idx} className="p-2 bg-[#1E1E1E] rounded border border-[#A1A1A1]/20">
-                                              <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-sm">{extraction.icon}</span>
-                                                <span className="text-xs text-purple-400 font-medium">{extraction.type}</span>
-                                              </div>
-                                              <div className="text-xs text-white">{extraction.content}</div>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  );
-                                }
-                                
-                                return null;
-                              })()}
                               
                               {/* Result Section */}
                               <div>
@@ -1007,111 +810,23 @@ There was a network error while trying to analyze your results.
                                   
                                   {/* Show extracted data if available */}
                                   {extractedData && extractedData.length > 0 && (
-                                    <div className="mt-2 p-2 bg-[#1E1E1E] rounded border border-[#A1A1A1]/20">
-                                      <div className="text-xs text-[#A1A1A1] mb-1">Additional Data:</div>
-                                      <div className="space-y-1">
-                                        {extractedData.map((data, idx) => (
-                                          <div key={idx} className="text-xs text-white">
-                                            • {data}
-                                          </div>
-                                        ))}
-                                      </div>
+                                    <div className="mt-3 p-2 bg-[#1E1E1E] rounded border border-[#A1A1A1]/20">
+                                      <div className="text-xs text-[#A1A1A1] mb-2">Extracted Data:</div>
+                                      {extractedData.map((data: string, idx: number) => (
+                                        <div key={idx} className="text-xs text-white bg-[#D9653B]/10 p-2 rounded mb-1 border-l-2 border-[#D9653B]">
+                                          {data.trim()}
+                                        </div>
+                                      ))}
                                     </div>
                                   )}
                                   
-                                  {/* Show detailed results from conversation logs */}
-                                  {(() => {
-                                    if (executionResult.full_conversation) {
-                                      const stepConversations = executionResult.full_conversation.filter((conv: any) => 
-                                        conv.step === step.step_number
-                                      );
-                                      
-                                      const resultDetails: Array<{type: string, content: string}> = [];
-                                      
-                                      stepConversations.forEach((stepConv: any) => {
-                                        if (stepConv.model_output) {
-                                          const conversationText = stepConv.model_output;
-                                          
-                                          // Look for Results: patterns
-                                          if (conversationText.includes('Results:')) {
-                                            const resultsMatch = conversationText.match(/Results:\s*(.+?)(?:\n|$)/);
-                                            if (resultsMatch) {
-                                              resultDetails.push({
-                                                type: 'Results',
-                                                content: resultsMatch[1].trim()
-                                              });
-                                            }
-                                          }
-                                          
-                                          // Look for action completion patterns
-                                          if (conversationText.includes('actions completed')) {
-                                            const actionsMatch = conversationText.match(/(\d+)\s*actions completed/);
-                                            if (actionsMatch) {
-                                              resultDetails.push({
-                                                type: 'Actions Completed',
-                                                content: `${actionsMatch[1]} actions completed`
-                                              });
-                                            }
-                                          }
-                                          
-                                          // Look for navigation success patterns
-                                          if (conversationText.includes('Successfully navigated to')) {
-                                            const navMatch = conversationText.match(/Successfully navigated to\s*(.+?)(?:\n|$)/);
-                                            if (navMatch) {
-                                              resultDetails.push({
-                                                type: 'Navigation',
-                                                content: `✅ ${navMatch[1].trim()}`
-                                              });
-                                            }
-                                          }
-                                          
-                                          // Look for click success patterns
-                                          if (conversationText.includes('Clicked button with index')) {
-                                            const clickMatch = conversationText.match(/Clicked button with index\s*(\d+)/);
-                                            if (clickMatch) {
-                                              resultDetails.push({
-                                                type: 'Interaction',
-                                                content: `✅ Clicked button index ${clickMatch[1]}`
-                                              });
-                                            }
-                                          }
-                                          
-                                          // Look for input success patterns
-                                          if (conversationText.includes('Input') && conversationText.includes('into index')) {
-                                            const inputMatch = conversationText.match(/Input\s+(.+?)\s+into index\s*(\d+)/);
-                                            if (inputMatch) {
-                                              resultDetails.push({
-                                                type: 'Input',
-                                                content: `✅ Input "${inputMatch[1]}" into index ${inputMatch[2]}`
-                                              });
-                                            }
-                                          }
-                                        }
-                                      });
-                                      
-                                      if (resultDetails.length > 0) {
-                                        return (
-                                          <div className="mt-3 space-y-2">
-                                            {resultDetails.map((detail, idx) => (
-                                              <div key={idx} className="p-2 bg-[#1E1E1E] rounded border border-[#A1A1A1]/20">
-                                                <div className="text-xs text-blue-400 font-medium mb-1">{detail.type}</div>
-                                                <div className="text-xs text-white">{detail.content}</div>
-                                              </div>
-                                            ))}
-                                          </div>
-                                        );
-                                      }
-                                    }
-                                    return null;
-                                  })()}
-                                  
-                                  {step.result && step.result !== 'N/A' && step.result.split('\n').length > 1 && (
+                                  {(isEnhancedStep ? step.result_details : step.result) && (isEnhancedStep ? step.result_details : step.result) !== 'N/A' && (isEnhancedStep ? JSON.stringify(step.result_details).split('\n').length > 1 : step.result.split('\n').length > 1) && (
                                     <details className="mt-2">
                                       <summary className="text-xs text-blue-400 cursor-pointer hover:text-blue-400/80">
                                         Show full result details
                                       </summary>
                                       <div className="mt-2 p-2 bg-[#1E1E1E] rounded border border-[#A1A1A1]/20 text-xs text-[#A1A1A1] max-h-32 overflow-y-auto font-mono">
-                                        {step.result}
+                                        {isEnhancedStep ? JSON.stringify(step.result_details, null, 2) : step.result}
                                       </div>
                                     </details>
                                   )}
@@ -1126,251 +841,49 @@ There was a network error while trying to analyze your results.
                 )}
 
                 {/* Extracted Content */}
-                {executionResult.full_conversation && executionResult.full_conversation.length > 0 && (
-                  <div className="mb-6">
-                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-[#D9653B]" />
-                      Extracted Content
-                    </h4>
-                    
-                    {/* Real Extracted Content - Using conversation data */}
-                    {(() => {
-                      // Extract all extraction data from conversation logs
-                      const allExtractions: Array<{
-                        step: number;
-                        timestamp: string;
-                        content: string;
-                        type: string;
-                      }> = [];
-                      
-                      if (executionResult.full_conversation) {
-                        executionResult.full_conversation.forEach((conv: any) => {
-                          // Check for structured extraction data
-                          if (conv.conversation_data && conv.conversation_data.extraction) {
-                            allExtractions.push({
-                              step: conv.step,
-                              timestamp: conv.timestamp,
-                              content: conv.conversation_data.extraction.content,
-                              type: conv.conversation_data.extraction.type
-                            });
-                          }
-                          
-                          // Check for extracted page content
-                          if (conv.conversation_data && conv.conversation_data.extracted_page_content) {
-                            const extractedContent = conv.conversation_data.extracted_page_content;
-                            if (typeof extractedContent === 'object' && extractedContent.video_titles) {
-                              extractedContent.video_titles.forEach((title: string) => {
-                                allExtractions.push({
-                                  step: conv.step,
-                                  timestamp: conv.timestamp,
-                                  content: title,
-                                  type: 'Video Title'
-                                });
-                              });
-                            }
-                          }
-                          
-                          // Also check for extraction patterns in model_output
-                          if (conv.model_output) {
-                            const conversationText = conv.model_output;
-                            
-                            // Look for ⚡ [EXTRACT] patterns
-                            if (conversationText.includes('⚡ [EXTRACT]') || conversationText.includes('EXTRACTION:')) {
-                              // Extract the actual extraction content
-                              const extractMatch = conversationText.match(/⚡ \[EXTRACT\] Agent Log: EXTRACTION:\s*✅\s*Extracted\s+(.+?):\s*(.+?)(?:\n|$)/);
-                              if (extractMatch) {
-                                const extractType = extractMatch[1].trim();
-                                const extractContent = extractMatch[2].trim();
-                                
-                                allExtractions.push({
-                                  step: conv.step,
-                                  timestamp: conv.timestamp,
-                                  content: extractContent,
-                                  type: extractType
-                                });
-                              }
-                            }
-                            
-                            // Look for 📄 Extracted from page JSON data
-                            if (conversationText.includes('📄') && conversationText.includes('Extracted from page')) {
-                              try {
-                                // Find JSON content after "📄 Extracted from page"
-                                const jsonMatch = conversationText.match(/📄\s*Extracted from page\s*:\s*```json\s*(\{[\s\S]*?\})\s*```/);
-                                if (jsonMatch) {
-                                  const jsonData = JSON.parse(jsonMatch[1]);
-                                  
-                                  // Handle different types of extracted data
-                                  if (jsonData.search_result_titles) {
-                                    jsonData.search_result_titles.forEach((title: string) => {
-                                      allExtractions.push({
-                                        step: conv.step,
-                                        timestamp: conv.timestamp,
-                                        content: title,
-                                        type: 'Search Result'
-                                      });
-                                    });
-                                  } else if (jsonData.video_titles) {
-                                    jsonData.video_titles.forEach((title: string) => {
-                                      allExtractions.push({
-                                        step: conv.step,
-                                        timestamp: conv.timestamp,
-                                        content: title,
-                                        type: 'Video Title'
-                                      });
-                                    });
-                                  } else if (jsonData.title) {
-                                    allExtractions.push({
-                                      step: conv.step,
-                                      timestamp: conv.timestamp,
-                                      content: jsonData.title,
-                                      type: 'Title'
-                                    });
-                                  } else if (jsonData.content) {
-                                    allExtractions.push({
-                                      step: conv.step,
-                                      timestamp: conv.timestamp,
-                                      content: jsonData.content,
-                                      type: 'Page Content'
-                                    });
-                                  } else {
-                                    // Show all available data
-                                    allExtractions.push({
-                                      step: conv.step,
-                                      timestamp: conv.timestamp,
-                                      content: JSON.stringify(jsonData, null, 2),
-                                      type: 'Page Data'
-                                    });
-                                  }
-                                }
-                              } catch (e) {
-                                // If JSON parsing fails, capture the raw text
-                                const rawMatch = conversationText.match(/📄\s*Extracted from page\s*:\s*(.+?)(?:\n|$)/);
-                                if (rawMatch) {
-                                  allExtractions.push({
-                                    step: conv.step,
-                                    timestamp: conv.timestamp,
-                                    content: rawMatch[1].trim(),
-                                    type: 'Raw Page Data'
-                                  });
-                                }
-                              }
-                            }
-                            
-                            // Look for other extraction patterns
-                            if (conversationText.includes('extracted') || 
-                                conversationText.includes('found') || 
-                                conversationText.includes('results') ||
-                                conversationText.includes('search_result_titles') ||
-                                conversationText.includes('video_titles')) {
-                              
-                              // Extract the actual data content
-                              let extractedContent = '';
-                              let contentType = 'Data';
-                              
-                              // Look for JSON-like content (actual page data)
-                              if (conversationText.includes('{') && conversationText.includes('}')) {
-                                try {
-                                  const jsonMatch = conversationText.match(/\{[\s\S]*\}/);
-                                  if (jsonMatch) {
-                                    const jsonData = JSON.parse(jsonMatch[0]);
-                                    
-                                    // Handle different types of extracted data
-                                    if (jsonData.search_result_titles) {
-                                      extractedContent = jsonData.search_result_titles.join('\n');
-                                      contentType = 'Search Results';
-                                    } else if (jsonData.video_titles) {
-                                      extractedContent = jsonData.video_titles.join('\n');
-                                      contentType = 'Video Titles';
-                                    } else if (jsonData.title) {
-                                      extractedContent = jsonData.title;
-                                      contentType = 'Title';
-                                    } else if (jsonData.content) {
-                                      extractedContent = jsonData.content;
-                                      contentType = 'Page Content';
-                                    } else {
-                                      // Show all available data
-                                      extractedContent = JSON.stringify(jsonData, null, 2);
-                                      contentType = 'Page Data';
-                                    }
-                                  }
-                                } catch (e) {
-                                  // If JSON parsing fails, extract text content
-                                  extractedContent = conversationText;
-                                  contentType = 'Text Content';
-                                }
-                              } else {
-                                // Extract text content for non-JSON data
-                                const lines = conversationText.split('\n').filter((line: string) => line.trim());
-                                const dataLines = lines.filter((line: string) => 
-                                  line.includes('extracted') ||
-                                  line.includes('found') ||
-                                  line.includes('results') ||
-                                  line.includes('search_result_titles') ||
-                                  line.includes('video_titles')
-                                );
-                                
-                                if (dataLines.length > 0) {
-                                  extractedContent = dataLines.join('\n');
-                                  contentType = 'Text Data';
-                                }
-                              }
-                              
-                              if (extractedContent && !allExtractions.some(ex => ex.content === extractedContent)) {
-                                allExtractions.push({
-                                  step: conv.step,
-                                  timestamp: conv.timestamp,
-                                  content: extractedContent,
-                                  type: contentType
-                                });
-                              }
-                            }
-                          }
-                        });
-                      }
-                      
-                      if (allExtractions.length > 0) {
-                        return (
-                          <div className="space-y-4">
-                            {allExtractions.map((item, index) => (
-                              <Card key={index} className="border-[#A1A1A1]/20">
-                                <CardContent className="p-4">
-                                  <div className="flex justify-between items-start mb-3">
-                                    <div className="flex items-center gap-2">
-                                      <Badge variant="outline" className="text-xs text-[#D9653B] border-[#D9653B]/30">
-                                        Step {item.step}
-                                      </Badge>
-                                      <Badge variant="secondary" className="text-xs bg-[#D9653B]/20 text-[#D9653B] border-[#D9653B]/30">
-                                        {item.type}
-                                      </Badge>
-                                    </div>
-                                    <span className="text-xs text-[#A1A1A1]">
-                                      {new Date(item.timestamp).toLocaleTimeString()}
-                                    </span>
-                                  </div>
-                                  <div className="text-sm text-white">
-                                    <span>• {item.content}</span>
-                                  </div>
-                                </CardContent>
-                              </Card>
-                            ))}
-                          </div>
-                        );
-                      } else {
-                        return (
-                          <Card className="border-[#A1A1A1]/20">
+                {(() => {
+                  const extractedContent = processExtractedContent(executionResult);
+                  return extractedContent.length > 0 && (
+                    <div className="mb-6">
+                      <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                        <FileText className="h-5 w-5 text-[#D9653B]" />
+                        Extracted Content
+                      </h4>
+                      <div className="space-y-3 max-h-64 overflow-y-auto">
+                        {extractedContent.map((content, index) => (
+                          <Card key={index} className="border-[#A1A1A1]/20">
                             <CardContent className="p-4">
-                              <div className="text-center text-[#A1A1A1]">
-                                <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                                <p>No extracted content found</p>
-                                <p className="text-xs mt-1">Try running a new task to see extraction results</p>
+                              <div className="flex justify-between items-start mb-3">
+                                <Badge variant="outline" className="text-xs text-[#D9653B] border-[#D9653B]/30">
+                                  Step {content.step_number}
+                                </Badge>
+                                <span className="text-xs text-[#A1A1A1]">
+                                  {new Date(content.timestamp).toLocaleTimeString()}
+                                </span>
                               </div>
+                              
+                              <div className="text-sm text-white mb-2">
+                                {content.content.includes('EXTRACTION:') ? 
+                                  content.content.replace('EXTRACTION:', '').trim() : 
+                                  content.content
+                                }
+                              </div>
+                              
+                              {content.data_type && (
+                                <div className="mt-2">
+                                  <Badge variant="secondary" className="text-xs bg-[#D9653B]/20 text-[#D9653B] border-[#D9653B]/30">
+                                    {content.data_type === 'search_result' ? 'Search Result' : 
+                                     content.data_type === 'extracted_data' ? 'Extracted Data' : 'General Data'}
+                                  </Badge>
+                                </div>
+                              )}
                             </CardContent>
                           </Card>
-                        );
-                      }
-                    })()}
-                  </div>
-                )}
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* Log File Links */}
                 {(executionResult.log_file || executionResult.detailed_log_file || executionResult.stdout_log_file || executionResult.agent_thoughts_file) && (
@@ -1564,7 +1077,7 @@ ${analysisResult.detailed_analysis?.recommendations?.map((rec: string) => `- ${r
                      // Fix compliance status if it's incorrectly showing as "Fail" due to target_url_accessed flag
                      if (typeof processedContent === 'string' && processedContent.includes('Compliance Status: Fail')) {
                        // Check if the task actually completed successfully
-                       if (executionResult && executionResult.success && executionResult.execution_steps && executionResult.execution_steps.length > 0) {
+                       if (executionResult && executionResult.success && (executionResult.enhanced_steps || executionResult.execution_steps) && (executionResult.enhanced_steps || executionResult.execution_steps).length > 0) {
                          // Replace the incorrect compliance status with a corrected one
                          processedContent = processedContent.replace(
                            /Compliance Status: Fail.*?\)/,
