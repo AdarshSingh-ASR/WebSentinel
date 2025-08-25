@@ -27,6 +27,17 @@
 ## 🎯 Overview
 
 WebSentinel is a comprehensive web testing platform that leverages Portia AI's agent framework to automate website testing and analysis. It combines the power of browser automation with intelligent, controllable AI agents to provide detailed insights into web application behavior. WebSentinel can be used to scrape things as well.
+
+🖼️ **Project Screenshots**
+![Test Configuration](images/dashboard.png)
+![Test Configuration](images/savedworkflow.png)
+![Execution Steps](images/executionsteps.png)
+![Execution Steps](images/executionsteps2.png)
+![Extracted Content](images/extractedcontent.png)
+![General Log Files](images/generallogfiles.png)
+![AI Analysis Report](images/analysis.png)
+![AI Analysis Report](images/analysis2.png)
+![Detailed Technical Analysis](images/technicalanalysis.png)
 ## 🤖 Why Portia AI?
 
 Portia AI enables us to create sophisticated, controllable AI agents that handle complex web testing workflows. Our system uses Portia's framework to orchestrate:
@@ -35,6 +46,8 @@ Portia AI enables us to create sophisticated, controllable AI agents that handle
 - **Analysis Agents** that process screenshots and extract insights  
 - **Validation Agents** that verify test results and compliance
 - **Custom Task Agents** that interpret natural language testing requests
+
+![Terminal Logs](images/terminal.png)
 
 ### Key Capabilities
 
